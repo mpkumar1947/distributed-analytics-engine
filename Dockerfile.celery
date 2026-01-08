@@ -1,0 +1,26 @@
+# Dockerfile.celery (in project root: iitk-grade-bot/Dockerfile.celery)
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY ./requirements.txt /app/requirements.txt
+
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy the entire api directory (which contains celery_app.py and tasks.py)
+# into /app/api/ within the image.
+# This structure is needed for the `celery -A api.celery_app:app ...` command.
+COPY ./api/ /app/api/
+
+# Copy scripts if your tasks depend on them
+# COPY ./scripts/ /app/scripts/
+
+# Set the working directory to /app.
+# Python's import mechanism will be able to find the 'api' package
+# from this directory if /app is implicitly in PYTHONPATH (which it usually is for WORKDIR).
+WORKDIR /app
+
+# CMD ["celery", "-A", "api.celery_app:app", "worker", "-l", "INFO", "-Q", "broadcasts", "-c", "1"]
