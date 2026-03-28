@@ -7,7 +7,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:
-      - "127.0.0.1:5432:5432" # Changed to localhost only for better security
+      - "127.0.0.1:5432:5432" # Changed to localhost for better security
     environment:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpassword
@@ -22,14 +22,7 @@ services:
     networks:
       - app_network
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis_broker
-    ports:
-      - "127.0.0.1:6379:6379" # Changed to localhost only for better security
-    restart: unless-stopped
-    networks:
-      - app_network
+  
 
   api:
     build:
@@ -49,59 +42,16 @@ services:
       redis:
         condition: service_started
     volumes:
-      - ./api:/app/api         # Mounts your API code
-      - ./alembic:/app/alembic # <<< ADDED: Mounts the alembic versions folder to /app/alembic
-      - ./alembic.ini:/app/alembic.ini # <<< ADDED: Mounts alembic.ini to /app/alembic.ini
-      - ./scripts:/app/scripts # <<< ADDED/ENSURED: Mounts your scripts folder to /app/scripts
-      - ./data:/app/data       # <<< ADDED: Mounts your data folder (for courses_with_fileids.csv) to /app/data
-    networks:
+      - ./api:/app/api        
+      - ./alembic:/app/alembic 
+      - ./alembic.ini:/app/alembic.ini 
+      - ./scripts:/app/scripts 
+      - ./data:/app/data       
       - app_network
 
-  bot:
-    build:
-      context: .
-      dockerfile: ./bot/Dockerfile
-    container_name: telegram_bot
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:7000:7000" # Bot's internal webhook server, Cloudflare Tunnel connects to this
-    environment:
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_ADMIN_IDS=${TELEGRAM_ADMIN_IDS}
-      - TELEGRAM_ADMIN_CHANNEL_ID=${TELEGRAM_ADMIN_CHANNEL_ID}
-      - API_BASE_URL=http://api:8000
-      - PUBLIC_DOMAIN=${PUBLIC_DOMAIN}
-      - WEBHOOK_URL_PATH_PREFIX=${WEBHOOK_URL_PATH_PREFIX}
-      - BOT_WEBHOOK_PORT=7000
-      - BOT_STARTUP_MAINTENANCE_MODE=true
-    depends_on:
-      - api
-    volumes:
-      - ./bot:/app # Mounts your Bot code
-    networks:
-      - app_network
+  
 
-  celery_worker:
-    build:
-      context: . # Build context is the project root
-      dockerfile: Dockerfile.celery
-    container_name: celery_worker_broadcasts
-    command: celery -A api.celery_app:app worker -l INFO -Q broadcasts -c 1
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://testuser:testpassword@db:5432/gradedb
-      - REDIS_URL=redis://redis:6379/0
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    volumes:
-      - ./api:/app/api # Mounts API code (where celery_app and tasks are)
-      # If celery worker needs scripts or data directly, mount them here too.
-      # For now, assuming tasks don't directly access ./scripts or ./data from worker.
-    networks:
-      - app_network
+ 
 
 volumes:
   postgres_data:

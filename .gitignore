@@ -1,0 +1,63 @@
+# --- Secrets & Environment Config ---
+.env
+.env.*
+env/
+venv/
+ENV/
+*.env
+data-pipeline/
+# --- Python & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+locustfile.py
+# --- Data & Logs (Protect your source CSVs) ---
+data/*.csv
+data/*.xlsx
+data/*.json
+*.log
+logs/
+celerybeat-schedule
+celerybeat.pid
+
+# --- Docker & System ---
+.docker/
+docker-compose.override.yml
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- IDE Settings ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Testing & Type Checking ---
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
