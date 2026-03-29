@@ -6,11 +6,7 @@ from slowapi.errors import RateLimitExceeded
 from .utils.limiter import limiter, _rate_limit_exceeded_handler
 from .routers import (
     search,
-    grades,
-    users,
-    feedback,
-    admin_users,
-    admin_broadcast,
+    grades,   
     professors
 )
 
@@ -29,10 +25,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.include_router(search.router)
 app.include_router(grades.router)
 app.include_router(professors.router)
-app.include_router(users.router)
-app.include_router(feedback.router)
-app.include_router(admin_users.router)
-app.include_router(admin_broadcast.router)
+
+# app.include_router(admin_broadcast.router)
 
 @app.get("/health", tags=["Health"])
 async def health_check():

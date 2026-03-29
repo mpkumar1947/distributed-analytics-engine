@@ -70,28 +70,5 @@ class Grade(Base):
     
     offering = relationship("Offering", back_populates="grades")
 
-class User(Base):
-    __tablename__ = 'users'
-    
-    telegram_user_id = Column(BIGINT, primary_key=True, index=True)
-    first_name = Column(VARCHAR(255), nullable=True)
-    last_name = Column(VARCHAR(255), nullable=True)
-    username = Column(VARCHAR(255), nullable=True)
-    is_subscribed = Column(BOOLEAN, default=True, nullable=False)
-    subscribed_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    last_active_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
-    is_blocked = Column(BOOLEAN, default=False, nullable=False)
-    block_reason = Column(VARCHAR(255), nullable=True)
-    blocked_at = Column(TIMESTAMP(timezone=True), nullable=True)
 
-class Feedback(Base):
-    __tablename__ = 'feedback'
-    
-    id = Column(Integer, primary_key=True, index=True)
-    telegram_user_id = Column(BIGINT, ForeignKey('users.telegram_user_id'), nullable=False, index=True)
-    feedback_type = Column(VARCHAR(50), nullable=False)
-    message_text = Column(VARCHAR, nullable=False)
-    submitted_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    status = Column(VARCHAR(20), default='new', nullable=False)
 
-    user = relationship("User")
