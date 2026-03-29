@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from slowapi.errors import RateLimitExceeded
 
 # Local Imports
-from .celery_app import app as celery_application
+# from .celery_app import app as celery_application
 from .utils.limiter import limiter, _rate_limit_exceeded_handler
 from .routers import (
     search,
