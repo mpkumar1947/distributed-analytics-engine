@@ -10,6 +10,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set")
 
+# Defensively ensure we use asyncpg even if the user copied a standard Neon connection string
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 # Connection settings optimized for Neon PostgreSQL free tier:
 # - pool_size=3: Small pool to stay within Neon's connection limits
 # - pool_timeout=15: Allows time for Neon cold start (~300-800ms)
