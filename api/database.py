@@ -19,6 +19,11 @@ elif DATABASE_URL.startswith("postgresql://"):
 # asyncpg expects 'ssl=require', not 'sslmode=require'
 DATABASE_URL = DATABASE_URL.replace("sslmode=require", "ssl=require")
 
+# asyncpg does not support channel_binding
+DATABASE_URL = DATABASE_URL.replace("&channel_binding=require", "")
+DATABASE_URL = DATABASE_URL.replace("?channel_binding=require&", "?")
+DATABASE_URL = DATABASE_URL.replace("?channel_binding=require", "")
+
 # Connection settings optimized for Neon PostgreSQL free tier:
 # - pool_size=3: Small pool to stay within Neon's connection limits
 # - pool_timeout=15: Allows time for Neon cold start (~300-800ms)
