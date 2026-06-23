@@ -87,6 +87,9 @@ async def main():
         if args.resume:
             logger.info("Filtering out instructors that already have a plot...")
             instructors_to_process = [i for i in instructors_to_process if not i.career_plot_file_id]
+            
+        # Ignore invalid/NaN instructors
+        instructors_to_process = [i for i in instructors_to_process if str(i.name).strip().lower() not in ('nan', 'none', 'unknown', 'unknown instructor', '')]
         
         logger.info(f"Found {len(instructors_to_process)} instructor(s) to process.")
         
