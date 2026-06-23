@@ -602,7 +602,9 @@
                         <td class="p-4 text-sm font-medium text-white">${userDisplay}</td>
                         <td class="p-4 text-sm"><span class="bg-slate-700 px-2 py-1 rounded text-xs">${fb.feedback_type}</span></td>
                         <td class="p-4"><span class="border px-2 py-1 rounded-full text-xs font-medium ${statusColor}">${fb.status.toUpperCase()}</span></td>
-                        <td class="p-4 text-sm text-slate-300 max-w-xs truncate cursor-pointer hover:whitespace-normal hover:bg-slate-800 rounded" title="Click to view full">${fb.message_text}</td>
+                        <td class="p-4 text-sm text-slate-300 max-w-xs">
+                            <div class="line-clamp-3" title="${fb.message_text.replace(/"/g, '&quot;')}">${fb.message_text}</div>
+                        </td>
                         <td class="p-4 text-right whitespace-nowrap">
                             <button onclick="openReplyModal(${fb.id}, ${fb.telegram_user_id}, '${userDisplay}', '${fb.message_text.replace(/'/g, "\\'")}')" class="text-blue-400 hover:text-blue-300 p-1 mx-1" title="Reply via Bot">💬</button>
                             <button onclick="updateFeedbackStatus(${fb.id}, 'read')" class="text-slate-400 hover:text-yellow-400 p-1 mx-1" title="Mark Read">👀</button>

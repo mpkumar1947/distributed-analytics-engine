@@ -76,7 +76,7 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
 MAINTENANCE_MESSAGE = (
-    "🚧 **Under Maintenance** 🚧\n\n"
+    " **Under Maintenance** \n\n"
     "GRADIATOR is currently undergoing a scheduled upgrade. "
     "The bot will be back online shortly. Thanks for your patience!"
 )
@@ -158,11 +158,11 @@ async def maintenance_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     if not context.args:
         current_status_val = redis_client.get('maintenance_mode')
         if not current_status_val:
-            status_msg = "✅ Mode: **LIVE** (Off)"
+            status_msg = " Mode: **LIVE** (Off)"
         elif current_status_val == 'stealth':
-            status_msg = "🤫 Mode: **STEALTH** (On, No Message)"
+            status_msg = " Mode: **STEALTH** (On, No Message)"
         else:
-            status_msg = f"🚧 Mode: **MESSAGE** (On)\n\n*Current Message:*\n{current_status_val}"
+            status_msg = f" Mode: **MESSAGE** (On)\n\n*Current Message:*\n{current_status_val}"
         
         await update.message.reply_text(
             f"**Maintenance Status**\n\n{status_msg}\n\n"
@@ -179,20 +179,20 @@ async def maintenance_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     # --- NEW: Updated Logic ---
     if command == 'off':
         redis_client.delete('maintenance_mode')
-        await update.message.reply_text("✅ Maintenance mode **DISABLED**. The bot is now live for all users.")
+        await update.message.reply_text(" Maintenance mode **DISABLED**. The bot is now live for all users.")
     
     elif command == 'on':
         if len(context.args) == 1:
             # Set to STEALTH mode (blocks with no reply)
             redis_client.set('maintenance_mode', 'stealth')
-            await update.message.reply_text("🤫 Maintenance mode **ENABLED (STEALTH)**. Non-admin users will be silently ignored.")
+            await update.message.reply_text(" Maintenance mode **ENABLED (STEALTH)**. Non-admin users will be silently ignored.")
         else:
             # Set to MESSAGE mode with a custom message
             custom_message = " ".join(context.args[1:])
             # We store the raw custom message (it's Markdown)
             redis_client.set('maintenance_mode', custom_message)
             await update.message.reply_text(
-                f"🚧 Maintenance mode **ENABLED (MESSAGE)**. Non-admin users will see:\n\n---\n{custom_message}\n---",
+                f" Maintenance mode **ENABLED (MESSAGE)**. Non-admin users will see:\n\n---\n{custom_message}\n---",
                 parse_mode=ParseMode.MARKDOWN,
                 disable_web_page_preview=True
             )
@@ -356,7 +356,7 @@ def escape_markdown_v2(text: str) -> str:
 
 def get_restart_keyboard() -> InlineKeyboardMarkup:
     """Returns a simple keyboard with a Restart Search button linked to BACK_TO_MAIN."""
-    return InlineKeyboardMarkup([[InlineKeyboardButton("🔄 Restart Search", callback_data=BACK_TO_MAIN)]])
+    return InlineKeyboardMarkup([[InlineKeyboardButton(" Restart Search", callback_data=BACK_TO_MAIN)]])
 
 
 async def _handle_api_error_async(error_source: str, error: Exception, context: ContextTypes.DEFAULT_TYPE,
@@ -395,7 +395,7 @@ async def _handle_api_error_async(error_source: str, error: Exception, context: 
         logger.log(log_level, f"Unexpected error ({error_source}): {error}", exc_info=exc_info_flag)
         user_message = "An unexpected internal error occurred\\. Please restart\\."  # Escaped period
 
-    user_message = f"❌ {user_message}"  # No period here, so no escape needed for this part
+    user_message = f" {user_message}"  # No period here, so no escape needed for this part
     error_keyboard = get_restart_keyboard()
 
     effective_chat_id = chat_id
@@ -433,7 +433,7 @@ def handle_api_error(error_source: str, error: Exception, context: ContextTypes.
 def _get_search_list_text_template(item_type: str, count: int, query: str, current_page_num: int) -> str:
     query_part = f" for '*{html.escape(query)}*'" if query else ""
     count_text = f"Found {count} {item_type}" if count != 1 else f"Found 1 {item_type.rstrip('s')}"
-    return f"✅ {count_text}{query_part}.\nPage {current_page_num}. Select one or browse:"
+    return f" {count_text}{query_part}.\nPage {current_page_num}. Select one or browse:"
 
 
 def _get_prof_course_list_text_template(prof_name: str, count: int, current_page_num: int) -> str:
@@ -471,14 +471,14 @@ async def display_grades_and_plot(update: Update, context: ContextTypes.DEFAULT_
          # --- NEW: Get the centric grading label ---
         centric_grading_label = grade_data.get('centric_grading')
         # --- Build the Caption Text ---
-        title_line = f"📊 <b>{html.escape(course_code)} - {html.escape(course_title)}</b> ({html.escape(year)} - {html.escape(sem)})"
-        prof_line = f"🧑‍🏫 <i>Instructor(s):</i> {html.escape(instructors)}"
-        students_line = f"👥 <i>Students Graded:</i> {grade_data.get('total_graded_students', '?')}"
+        title_line = f" <b>{html.escape(course_code)} - {html.escape(course_title)}</b> ({html.escape(year)} - {html.escape(sem)})"
+        prof_line = f"‍ <i>Instructor(s):</i> {html.escape(instructors)}"
+        students_line = f" <i>Students Graded:</i> {grade_data.get('total_graded_students', '?')}"
         caption_parts = [title_line, prof_line, students_line]
 
         # --- NEW: Add the analysis line to the caption if it exists ---
         if centric_grading_label:
-            analysis_line = f"\n🧠 <b>Analysis:</b> {html.escape(centric_grading_label)}"
+            analysis_line = f"\n <b>Analysis:</b> {html.escape(centric_grading_label)}"
             caption_parts.append(analysis_line)
         
         grade_lines = []
@@ -547,7 +547,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     if user and user.first_name:
         user_first_name = escape_markdown_v1(user.first_name) # Keep the bug fix
     
-    welcome_text = f"👋 Hi {user_first_name}!\nHow would you like to search?"
+    welcome_text = f" Hi {user_first_name}!\nHow would you like to search?"
     keyboard = get_start_keyboard()
 
     try:
@@ -623,11 +623,11 @@ async def select_search_mode_callback(update: Update, context: ContextTypes.DEFA
 
         if callback_data == COURSE_SEARCH_MODE:
             context.user_data['search_mode'] = 'course'
-            prompt_text = "📚 OK. Enter **course code OR full/partial title**:";
+            prompt_text = " OK. Enter **course code OR full/partial title**:";
             next_state = TYPING_COURSE
         elif callback_data == PROF_SEARCH_MODE:
             context.user_data['search_mode'] = 'prof'
-            prompt_text = "🧑‍🏫 OK. Enter **professor's name**:";
+            prompt_text = "‍ OK. Enter **professor's name**:";
             next_state = TYPING_PROF
         else:
             raise ValueError(f"Unknown search mode callback: {callback_data}")
@@ -659,7 +659,7 @@ async def _handle_search_text_input(update: Update, context: ContextTypes.DEFAUL
 
     if len(query_text) < min_len:
         error_text = (
-            f"⚠️ Min {min_len} characters required for {search_type} search.\nPlease re-enter {search_type} name/code:")
+            f"️ Min {min_len} characters required for {search_type} search.\nPlease re-enter {search_type} name/code:")
         if bot_prompt_message_id:
             try:
                 await context.bot.edit_message_text(chat_id=chat_id, message_id=bot_prompt_message_id, text=error_text,
@@ -704,7 +704,7 @@ async def _handle_search_text_input(update: Update, context: ContextTypes.DEFAUL
         results = await search_items_api(query=query_text, search_type=search_type, user_id=user.id if user else None)
         if not results:
             await context.bot.edit_message_text(chat_id=chat_id, message_id=bot_prompt_message_id,
-                                                text=f"🤷 No {item_name_plural} matching '*{html.escape(query_text)}*'. Try again:",
+                                                text=f" No {item_name_plural} matching '*{html.escape(query_text)}*'. Try again:",
                                                 reply_markup=get_cancel_keyboard(), parse_mode=ParseMode.MARKDOWN)
             return current_typing_state
 
@@ -814,12 +814,12 @@ async def select_item_callback(update: Update, context: ContextTypes.DEFAULT_TYP
                 if back_button_cb_data_no_terms:
                     buttons_for_no_terms_kb.append(
                         [InlineKeyboardButton(back_button_text_no_terms, callback_data=back_button_cb_data_no_terms)])
-                buttons_for_no_terms_kb.append([InlineKeyboardButton("🔄 New Search", callback_data=BACK_TO_MAIN)])
+                buttons_for_no_terms_kb.append([InlineKeyboardButton(" New Search", callback_data=BACK_TO_MAIN)])
                 no_results_kb = InlineKeyboardMarkup(buttons_for_no_terms_kb)
 
                 prof_msg_part = f" by Prof. {html.escape(context.user_data.get('selected_prof_name', ''))}" if search_mode == 'prof' else ""
                 await query.edit_message_text(
-                    f"🤷 No offerings found for **{html.escape(selected_course_code)}**{prof_msg_part}.",
+                    f" No offerings found for **{html.escape(selected_course_code)}**{prof_msg_part}.",
                     reply_markup=no_results_kb, parse_mode=ParseMode.MARKDOWN)
                 return target_back_state_no_terms
 
@@ -902,7 +902,7 @@ async def view_prof_courses_callback(update: Update, context: ContextTypes.DEFAU
     the list of all courses taught by the selected professor.
     """
     query = update.callback_query
-    await query.answer("📚 Loading courses...")
+    await query.answer(" Loading courses...")
     user_id = update.effective_user.id
     chat_id = query.message.chat_id
 
@@ -927,7 +927,7 @@ async def view_prof_courses_callback(update: Update, context: ContextTypes.DEFAU
         if not prof_offerings_raw:
             await context.bot.send_message(
                 chat_id,
-                text=f"🧑‍🏫 **{html.escape(prof_name)}**\n\n🤷 No specific course offerings were found.",
+                text=f"‍ **{html.escape(prof_name)}**\n\n No specific course offerings were found.",
                 parse_mode=ParseMode.MARKDOWN
             )
             return SELECTING_COURSE_FOR_PROF
@@ -1021,7 +1021,7 @@ async def select_year_semester_callback(update: Update, context: ContextTypes.DE
                 current_page=current_page_for_retry
             )
             await message_to_edit.edit_text(
-                f"❌ Could not find specific record for **{html.escape(course_code)} / {html.escape(year_selected)} ({html.escape(semester_selected)})**. Please select another from the list below, or go back.",
+                f" Could not find specific record for **{html.escape(course_code)} / {html.escape(year_selected)} ({html.escape(semester_selected)})**. Please select another from the list below, or go back.",
                 reply_markup=retry_keyboard,
                 parse_mode=ParseMode.MARKDOWN
             )
@@ -1043,7 +1043,7 @@ async def select_year_semester_callback(update: Update, context: ContextTypes.DE
                 current_page=current_page_for_retry
             )
             await message_to_edit.edit_text(
-                f"❌ No grade data found for **{html.escape(course_code)} ({html.escape(year_selected)}-{html.escape(semester_selected)})**. Please select another from the list below, or go back.",
+                f" No grade data found for **{html.escape(course_code)} ({html.escape(year_selected)}-{html.escape(semester_selected)})**. Please select another from the list below, or go back.",
                 reply_markup=retry_keyboard,
                 parse_mode=ParseMode.MARKDOWN
             )
@@ -1221,7 +1221,7 @@ async def back_to_main_callback(update: Update, context: ContextTypes.DEFAULT_TY
     if user and user.first_name:
         user_first_name = escape_markdown_v1(user.first_name) # Use the escape function
 
-    welcome_text = f"👋 Hi {user_first_name}!\nHow would you like to search?"
+    welcome_text = f" Hi {user_first_name}!\nHow would you like to search?"
     # --- END FIX ---
     start_keyboard = get_start_keyboard()
 
@@ -1256,7 +1256,7 @@ async def back_to_typing_course_callback(update: Update, context: ContextTypes.D
     context.user_data.pop('current_ys_list_mode', None);
     context.user_data.pop('current_ys_list_identifier', None)
     context.user_data['search_mode'] = 'course'
-    prompt_text = "📚 OK. Re-enter **course code OR full/partial title**:"
+    prompt_text = " OK. Re-enter **course code OR full/partial title**:"
     msg_id = query.message.message_id;
     chat_id = query.message.chat_id
     context.user_data['original_message_id_for_edit'] = msg_id
@@ -1286,7 +1286,7 @@ async def back_to_typing_prof_callback(update: Update, context: ContextTypes.DEF
     context.user_data.pop('current_ys_list_mode', None);
     context.user_data.pop('current_ys_list_identifier', None)
     context.user_data['search_mode'] = 'prof'
-    prompt_text = "🧑‍🏫 OK. Re-enter **professor's name**:"
+    prompt_text = "‍ OK. Re-enter **professor's name**:"
     msg_id = query.message.message_id;
     chat_id = query.message.chat_id
     context.user_data['original_message_id_for_edit'] = msg_id
@@ -1539,7 +1539,7 @@ async def cancel_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE
     await _disable_previous_plot_buttons(context)
     user = update.effective_user;
     logger.info(f"User {user.id if user else 'Unknown'} canceled a conversation.")
-    text = "✅ Process cancelled.\nUse /start for a new search\n\n or /feedback to leave feedback."
+    text = " Process cancelled.\nUse /start for a new search\n\n or /feedback to leave feedback."
     last_plot_msg_id = context.user_data.pop('last_plot_message_id', None)
     if last_plot_msg_id and update.effective_chat:
         try:
@@ -1626,20 +1626,20 @@ async def subscribe_command(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             username=user.username
         )
         if api_response and api_response.get('is_subscribed'):
-            await update.message.reply_text("✅ You are now subscribed for updates!")
+            await update.message.reply_text(" You are now subscribed for updates!")
         elif api_response:
             logger.warning(
                 f"Subscription for user {user.id} processed by API but 'is_subscribed' not true or missing. Response: {api_response}")
-            await update.message.reply_text("✅ Your subscription status has been updated.")
+            await update.message.reply_text(" Your subscription status has been updated.")
         else:
             logger.error(f"Subscription API call failed or returned None for user {user.id}.")
             await update.message.reply_text(
-                "⚠️ Could not process your subscription at this time. Please try again later.")
+                "️ Could not process your subscription at this time. Please try again later.")
     except Exception as e:
         logger.error(f"Error in /subscribe command for user {user.id}: {e}", exc_info=True)
         # Error message via handle_api_error (which uses V2) or direct like this.
         # For consistency, if direct error messages are simple, this is okay.
-        await update.message.reply_text("❌ An error occurred while trying to subscribe. Please try again later.")
+        await update.message.reply_text(" An error occurred while trying to subscribe. Please try again later.")
 
 
 async def unsubscribe_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1653,22 +1653,22 @@ async def unsubscribe_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     try:
         api_response = await unsubscribe_user_api(tg_user_id=user.id)
         if api_response and api_response.get('is_subscribed') is False:
-            await update.message.reply_text("🚫 You have been unsubscribed from updates.")
+            await update.message.reply_text(" You have been unsubscribed from updates.")
         elif api_response and "unsubscribed" in api_response.get("detail", "").lower():  # Check detail from API
-            await update.message.reply_text("🚫 You have been unsubscribed from updates.")
+            await update.message.reply_text(" You have been unsubscribed from updates.")
         elif api_response:  # API responded but maybe status was already unsubscribed or other detail
             logger.warning(
                 f"Unsubscription for user {user.id} processed by API but confirmation unclear. Response: {api_response}")
             await update.message.reply_text(
                 api_response.get('detail',
-                                 "⚠️ Could not confirm unsubscription. You might already be unsubscribed or an issue occurred."))
+                                 "️ Could not confirm unsubscription. You might already be unsubscribed or an issue occurred."))
         else:  # No response from API
             logger.error(f"Unsubscription API call failed or returned None for user {user.id}.")
             await update.message.reply_text(
-                "⚠️ Could not process your unsubscription at this time. Please try again later.")
+                "️ Could not process your unsubscription at this time. Please try again later.")
     except Exception as e:
         logger.error(f"Error in /unsubscribe command for user {user.id}: {e}", exc_info=True)
-        await update.message.reply_text("❌ An error occurred while trying to unsubscribe. Please try again later.")
+        await update.message.reply_text(" An error occurred while trying to unsubscribe. Please try again later.")
 
 
 async def feedback_start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -1681,7 +1681,7 @@ async def feedback_start_command(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data.pop('feedback_message', None)
     context.user_data.pop('feedback_type', None)
 
-    text = "Thank you for offering to provide feedback! 🙏\nWhat kind of feedback would you like to give?"
+    text = "Thank you for offering to provide feedback! \nWhat kind of feedback would you like to give?"
     await update.message.reply_text(text, reply_markup=get_feedback_type_keyboard())  # Standard Markdown
     return ASK_FEEDBACK_TYPE
 
@@ -1697,9 +1697,9 @@ async def feedback_type_callback(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data['feedback_type'] = feedback_type
 
     type_str_map = {
-        FEEDBACK_TYPE_BUG: "bug report 🐛",
-        FEEDBACK_TYPE_SUGGESTION: "suggestion 💡",
-        FEEDBACK_TYPE_GENERAL: "general feedback 🗣️"
+        FEEDBACK_TYPE_BUG: "bug report ",
+        FEEDBACK_TYPE_SUGGESTION: "suggestion ",
+        FEEDBACK_TYPE_GENERAL: "general feedback ️"
     }
     type_display = type_str_map.get(feedback_type, "feedback")
 
@@ -1784,7 +1784,7 @@ async def feedback_confirm_send_callback(update: Update, context: ContextTypes.D
             username=user.username
         )
         if api_response:
-            await query.edit_message_text("✅ Thank you! Your feedback has been submitted successfully.",  # Simple text
+            await query.edit_message_text(" Thank you! Your feedback has been submitted successfully.",  # Simple text
                                           reply_markup=None)
             logger.info(
                 f"Feedback from user {user.id} (type: {feedback_type}) submitted successfully. API Response: {api_response}")
@@ -1794,7 +1794,7 @@ async def feedback_confirm_send_callback(update: Update, context: ContextTypes.D
                 user_identifier = f"@{user.username}" if user.username else f"ID: {user.id}"
                 # Critical: This message uses MARKDOWN_V2 and escapes user content
                 admin_message = (
-                    f"📝 *New Feedback Received*\n\n"
+                    f" *New Feedback Received*\n\n"
                     f"*User:* {escape_markdown_v2(user.full_name or '')} \\({escape_markdown_v2(user_identifier)}\\)\n"
                     f"*Type:* `{escape_markdown_v2(feedback_type)}`\n\n"
                     f"*Message:*\n{escape_markdown_v2(message_text)}"
@@ -1812,12 +1812,12 @@ async def feedback_confirm_send_callback(update: Update, context: ContextTypes.D
         else:  # API call returned None or non-truthy
             logger.error(f"Feedback submission API call failed or returned None for user {user.id}.")
             await query.edit_message_text(
-                "❌ Could not submit feedback due to an API error\\. Please try again later\\.",  # Using V2 escape
+                " Could not submit feedback due to an API error\\. Please try again later\\.",  # Using V2 escape
                 reply_markup=None, parse_mode=ParseMode.MARKDOWN_V2)
     except Exception as e:  # Exception during the API call itself
         logger.error(f"Error during feedback submission API call for user {user.id}: {e}", exc_info=True)
         await query.edit_message_text(
-            "❌ An unexpected error occurred while submitting your feedback\\. Please try again\\.",  # Using V2 escape
+            " An unexpected error occurred while submitting your feedback\\. Please try again\\.",  # Using V2 escape
             reply_markup=None, parse_mode=ParseMode.MARKDOWN_V2)
 
     context.user_data.pop('feedback_message', None)
@@ -1879,7 +1879,7 @@ async def block_user_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     """Handles /block command for admins."""
     user = update.effective_user
     if not user or not is_admin(user.id):
-        await update.message.reply_text("❌ You are not authorized to use this command\\.",  # Escaped .
+        await update.message.reply_text(" You are not authorized to use this command\\.",  # Escaped .
                                         parse_mode=ParseMode.MARKDOWN_V2)
         return
 
@@ -1898,21 +1898,21 @@ async def block_user_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         if response and response.get('is_blocked'):
             blocked_reason = response.get('block_reason', 'N/A')
             await update.message.reply_text(
-                f"✅ User `{escape_markdown_v2(target_user_identifier)}` has been blocked\\. Reason: {escape_markdown_v2(blocked_reason)}",
+                f" User `{escape_markdown_v2(target_user_identifier)}` has been blocked\\. Reason: {escape_markdown_v2(blocked_reason)}",
                 # Escaped .
                 parse_mode=ParseMode.MARKDOWN_V2)
         elif response:
             detail = response.get('detail', 'Unknown error')
-            await update.message.reply_text(f"⚠️ Could not block user\\. API response: {escape_markdown_v2(detail)}",
+            await update.message.reply_text(f"️ Could not block user\\. API response: {escape_markdown_v2(detail)}",
                                             # Escaped .
                                             parse_mode=ParseMode.MARKDOWN_V2)
         else:
             await update.message.reply_text(
-                "❌ Error blocking user via API\\. No response or failed response from API\\.",  # Escaped .
+                " Error blocking user via API\\. No response or failed response from API\\.",  # Escaped .
                 parse_mode=ParseMode.MARKDOWN_V2)
     except Exception as e:
         logger.error(f"Error in block_user_command: {e}", exc_info=True)
-        await update.message.reply_text("❌ An internal error occurred while trying to block the user\\.",  # Escaped .
+        await update.message.reply_text(" An internal error occurred while trying to block the user\\.",  # Escaped .
                                         parse_mode=ParseMode.MARKDOWN_V2)
 
 
@@ -1920,7 +1920,7 @@ async def unblock_user_command(update: Update, context: ContextTypes.DEFAULT_TYP
     """Handles /unblock command for admins."""
     user = update.effective_user
     if not user or not is_admin(user.id):
-        await update.message.reply_text("❌ You are not authorized to use this command\\.",  # Escaped .
+        await update.message.reply_text(" You are not authorized to use this command\\.",  # Escaped .
                                         parse_mode=ParseMode.MARKDOWN_V2)
         return
 
@@ -1936,20 +1936,20 @@ async def unblock_user_command(update: Update, context: ContextTypes.DEFAULT_TYP
                                                    admin_user_id=user.id)
         if response and response.get('is_blocked') is False:
             await update.message.reply_text(
-                f"✅ User `{escape_markdown_v2(target_user_identifier)}` has been unblocked\\.",  # Escaped .
+                f" User `{escape_markdown_v2(target_user_identifier)}` has been unblocked\\.",  # Escaped .
                 parse_mode=ParseMode.MARKDOWN_V2)
         elif response:
             detail = response.get('detail', 'Unknown error or user not found/already unblocked')
-            await update.message.reply_text(f"⚠️ Could not unblock user\\. API response: {escape_markdown_v2(detail)}",
+            await update.message.reply_text(f"️ Could not unblock user\\. API response: {escape_markdown_v2(detail)}",
                                             # Escaped .
                                             parse_mode=ParseMode.MARKDOWN_V2)
         else:
             await update.message.reply_text(
-                "❌ Error unblocking user via API\\. No response or failed response from API\\.",  # Escaped .
+                " Error unblocking user via API\\. No response or failed response from API\\.",  # Escaped .
                 parse_mode=ParseMode.MARKDOWN_V2)
     except Exception as e:
         logger.error(f"Error in unblock_user_command: {e}", exc_info=True)
-        await update.message.reply_text("❌ An internal error occurred while trying to unblock the user\\.",  # Escaped .
+        await update.message.reply_text(" An internal error occurred while trying to unblock the user\\.",  # Escaped .
                                         parse_mode=ParseMode.MARKDOWN_V2)
 
 
@@ -1957,7 +1957,7 @@ async def user_status_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     """Handles /userstatus command for admins."""
     user = update.effective_user
     if not user or not is_admin(user.id):
-        await update.message.reply_text("❌ You are not authorized to use this command\\.",  # Escaped .
+        await update.message.reply_text(" You are not authorized to use this command\\.",  # Escaped .
                                         parse_mode=ParseMode.MARKDOWN_V2)
         return
 
@@ -1987,7 +1987,7 @@ async def user_status_command(update: Update, context: ContextTypes.DEFAULT_TYPE
                 parse_mode=ParseMode.MARKDOWN_V2)
     except Exception as e:
         logger.error(f"Error in user_status_command: {e}", exc_info=True)
-        await update.message.reply_text("❌ An internal error occurred while fetching user status\\.",  # Escaped .
+        await update.message.reply_text(" An internal error occurred while fetching user status\\.",  # Escaped .
                                         parse_mode=ParseMode.MARKDOWN_V2)
 
 
@@ -1996,7 +1996,7 @@ async def user_status_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def broadcast_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     if not user or not is_admin(user.id):
-        await update.message.reply_text("❌ You are not authorized for this command\\.", parse_mode=ParseMode.MARKDOWN_V2)
+        await update.message.reply_text(" You are not authorized for this command\\.", parse_mode=ParseMode.MARKDOWN_V2)
         return
 
     if not context.args:
@@ -2013,7 +2013,7 @@ async def broadcast_admin_command(update: Update, context: ContextTypes.DEFAULT_
 
     # Simple validation for message length using the processed message
     if len(message_to_broadcast_processed) < 5: # Adjusted min length slightly
-        await update.message.reply_text("⚠️ Broadcast message seems too short\\. Please provide a meaningful message\\.",
+        await update.message.reply_text("️ Broadcast message seems too short\\. Please provide a meaningful message\\.",
                                         parse_mode=ParseMode.MARKDOWN_V2)
         return
 
@@ -2037,21 +2037,21 @@ async def broadcast_admin_command(update: Update, context: ContextTypes.DEFAULT_
         response = await initiate_broadcast_api(message_text=message_to_broadcast_processed, admin_user_id=user.id)
         
         if response and response.get('task_id'):
-            await update.message.reply_text(f"✅ Broadcast successfully queued\\.\nTask ID: `{escape_markdown_v2(str(response['task_id']))}`",
+            await update.message.reply_text(f" Broadcast successfully queued\\.\nTask ID: `{escape_markdown_v2(str(response['task_id']))}`",
                                             parse_mode=ParseMode.MARKDOWN_V2)
         else:
             api_error_detail_raw = response.get('detail', 'No specific detail from API.') if response else 'No response from API.'
             escaped_api_error_detail = escape_markdown_v2(api_error_detail_raw)
             await update.message.reply_text(
-                f"⚠️ Could not queue broadcast via API\\. Error: {escaped_api_error_detail}",
+                f"️ Could not queue broadcast via API\\. Error: {escaped_api_error_detail}",
                 parse_mode=ParseMode.MARKDOWN_V2)
     except httpx.RequestError as e_req: # Catch network errors specifically
         logger.error(f"Network error calling initiate_broadcast_api from bot: {e_req}", exc_info=True)
-        await update.message.reply_text("❌ Failed to send broadcast request due to a network connection error with the API\\.",
+        await update.message.reply_text(" Failed to send broadcast request due to a network connection error with the API\\.",
                                         parse_mode=ParseMode.MARKDOWN_V2)
     except Exception as e: # Catch other exceptions
         logger.error(f"Error calling initiate_broadcast_api from bot: {e}", exc_info=True)
-        await update.message.reply_text("❌ Failed to send broadcast request due to an internal error\\.",
+        await update.message.reply_text(" Failed to send broadcast request due to an internal error\\.",
                                         parse_mode=ParseMode.MARKDOWN_V2)
 
 
@@ -2061,11 +2061,11 @@ async def admin_help_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     admin_ids = context.application.bot_data.get('ADMIN_USER_IDS', [])
 
     if not user or user.id not in admin_ids:
-        await update.message.reply_text("❌ This command is for bot admins only.")
+        await update.message.reply_text(" This command is for bot admins only.")
         return
 
     admin_help_text = (
-        "🛠️ *Admin Command Reference*\n\n"
+        "️ *Admin Command Reference*\n\n"
         "Here are the available commands for managing the bot:\n\n"
         "*/maintenance <on|off>*"
         "\n_Toggles maintenance mode for all non-admin users._\n\n"

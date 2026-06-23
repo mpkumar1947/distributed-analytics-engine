@@ -25,18 +25,18 @@ logger = logging.getLogger(__name__)
 def get_start_keyboard() -> InlineKeyboardMarkup:
     """Initial search mode selection."""
     keyboard = [
-        [InlineKeyboardButton("📚 Search by Course (Code/Title)", callback_data=COURSE_SEARCH_MODE)],
-        [InlineKeyboardButton("🧑‍🏫 Search by Professor", callback_data=PROF_SEARCH_MODE)]
+        [InlineKeyboardButton("Search by Course (Code/Title)", callback_data=COURSE_SEARCH_MODE)],
+        [InlineKeyboardButton("Search by Professor", callback_data=PROF_SEARCH_MODE)]
     ]
     return InlineKeyboardMarkup(keyboard)
 
 def get_cancel_keyboard() -> InlineKeyboardMarkup:
     """Generic cancel button."""
-    return InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cancel", callback_data=CANCEL)]])
+    return InlineKeyboardMarkup([[InlineKeyboardButton("Cancel", callback_data=CANCEL)]])
 
 def get_restart_keyboard() -> InlineKeyboardMarkup:
     """Button to restart the search flow."""
-    return InlineKeyboardMarkup([[InlineKeyboardButton("🔄 Restart Search", callback_data=BACK_TO_MAIN)]])
+    return InlineKeyboardMarkup([[InlineKeyboardButton("Restart Search", callback_data=BACK_TO_MAIN)]])
 
 # ==============================================================================
 # PAGINATION HELPERS
@@ -58,10 +58,10 @@ def _add_pagination_buttons(
     payload_str = "_".join(map(str, payload_parts)) + "_" if payload_parts else ""
 
     if current_page > 0:
-        row.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"{base_callback_prefix}{payload_str}{current_page - 1}"))
+        row.append(InlineKeyboardButton("Previous", callback_data=f"{base_callback_prefix}{payload_str}{current_page - 1}"))
 
     if current_page < total_pages - 1:
-        row.append(InlineKeyboardButton("Next ➡️", callback_data=f"{base_callback_prefix}{payload_str}{current_page + 1}"))
+        row.append(InlineKeyboardButton("Next", callback_data=f"{base_callback_prefix}{payload_str}{current_page + 1}"))
 
     if row:
         keyboard.append(row)
@@ -102,8 +102,8 @@ def create_search_results_keyboard(
     # Navigation Footer
     back_cb = BACK_TO_TYPING_COURSE if search_type == 'course' else BACK_TO_TYPING_PROF
     keyboard.append([
-         InlineKeyboardButton("⬅️ Re-enter Search", callback_data=back_cb),
-         InlineKeyboardButton("❌ Cancel", callback_data=CANCEL)
+         InlineKeyboardButton("Re-enter Search", callback_data=back_cb),
+         InlineKeyboardButton("Cancel", callback_data=CANCEL)
     ])
     return InlineKeyboardMarkup(keyboard)
 
@@ -131,8 +131,8 @@ def create_prof_course_selection_keyboard(
     )
 
     keyboard.append([
-        InlineKeyboardButton("⬅️ Different Professor", callback_data=BACK_TO_PROF_SEARCH_LIST),
-        InlineKeyboardButton("❌ Cancel", callback_data=CANCEL)
+        InlineKeyboardButton("Different Professor", callback_data=BACK_TO_PROF_SEARCH_LIST),
+        InlineKeyboardButton("Cancel", callback_data=CANCEL)
     ])
     return InlineKeyboardMarkup(keyboard)
 
@@ -177,8 +177,8 @@ def create_year_semester_keyboard(
         back_cb = f"{BACK_TO_PROF_COURSE_LIST_PREFIX}{back_id}"
 
     keyboard.append([
-        InlineKeyboardButton("⬅️ Back", callback_data=back_cb),
-        InlineKeyboardButton("❌ Cancel", callback_data=CANCEL)
+        InlineKeyboardButton("Back", callback_data=back_cb),
+        InlineKeyboardButton("Cancel", callback_data=CANCEL)
     ])
     return InlineKeyboardMarkup(keyboard)
 
@@ -187,24 +187,24 @@ def get_final_options_keyboard(course_code: str, search_mode: Optional[str], pro
     keyboard = []
     
     # 1. Change Semester
-    keyboard.append([InlineKeyboardButton("⬅️ Select Diff. Year/Sem", callback_data=f"{BACK_TO_YEAR_SEM_SELECT_PREFIX}{course_code}")])
+    keyboard.append([InlineKeyboardButton("Select Diff. Year/Sem", callback_data=f"{BACK_TO_YEAR_SEM_SELECT_PREFIX}{course_code}")])
 
     # 2. Back to Course List (Context aware)
     if search_mode == 'course':
-        keyboard.append([InlineKeyboardButton("⬅️ Select Diff. Course", callback_data=f"{BACK_TO_COURSE_LIST_FROM_PLOT_PREFIX}course")])
+        keyboard.append([InlineKeyboardButton("Select Diff. Course", callback_data=f"{BACK_TO_COURSE_LIST_FROM_PLOT_PREFIX}course")])
     elif search_mode == 'prof' and prof_id:
-        keyboard.append([InlineKeyboardButton("⬅️ Select Diff. Course", callback_data=f"{BACK_TO_COURSE_LIST_FROM_PLOT_PREFIX}prof_{prof_id}")])
+        keyboard.append([InlineKeyboardButton("Select Diff. Course", callback_data=f"{BACK_TO_COURSE_LIST_FROM_PLOT_PREFIX}prof_{prof_id}")])
 
     # 3. Restart
-    keyboard.append([InlineKeyboardButton("🔄 New Search", callback_data=BACK_TO_MAIN)])
+    keyboard.append([InlineKeyboardButton("New Search", callback_data=BACK_TO_MAIN)])
     return InlineKeyboardMarkup(keyboard)
 
 def get_dossier_keyboard(prof_id: int) -> InlineKeyboardMarkup:
     """Options displayed with Professor Dossier."""
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("📚 View All Courses Taught", callback_data=f"{VIEW_PROF_COURSES_PREFIX}{prof_id}")],
-        [InlineKeyboardButton("⬅️ Select Different Professor", callback_data=BACK_TO_PROF_SEARCH_LIST)],
-        [InlineKeyboardButton("🔄 New Search", callback_data=BACK_TO_MAIN)]
+        [InlineKeyboardButton("View All Courses Taught", callback_data=f"{VIEW_PROF_COURSES_PREFIX}{prof_id}")],
+        [InlineKeyboardButton("Select Different Professor", callback_data=BACK_TO_PROF_SEARCH_LIST)],
+        [InlineKeyboardButton("New Search", callback_data=BACK_TO_MAIN)]
     ])
 
 # ==============================================================================
@@ -213,18 +213,18 @@ def get_dossier_keyboard(prof_id: int) -> InlineKeyboardMarkup:
 
 def get_feedback_type_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🐛 Bug Report", callback_data=FEEDBACK_TYPE_BUG)],
-        [InlineKeyboardButton("💡 Suggestion", callback_data=FEEDBACK_TYPE_SUGGESTION)],
-        [InlineKeyboardButton("🗣️ General Feedback", callback_data=FEEDBACK_TYPE_GENERAL)],
-        [InlineKeyboardButton("❌ Cancel Feedback", callback_data=CANCEL)]
+        [InlineKeyboardButton("Bug Report", callback_data=FEEDBACK_TYPE_BUG)],
+        [InlineKeyboardButton("Suggestion", callback_data=FEEDBACK_TYPE_SUGGESTION)],
+        [InlineKeyboardButton("General Feedback", callback_data=FEEDBACK_TYPE_GENERAL)],
+        [InlineKeyboardButton("Cancel Feedback", callback_data=CANCEL)]
     ])
 
 def get_feedback_entry_cancel_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([[InlineKeyboardButton("↩️ Cancel & Change Type", callback_data=CANCEL_FEEDBACK)]])
+    return InlineKeyboardMarkup([[InlineKeyboardButton("Cancel & Change Type", callback_data=CANCEL_FEEDBACK)]])
 
 def get_feedback_confirmation_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("✅ Yes, send it", callback_data=CONFIRM_SEND_FEEDBACK)],
-        [InlineKeyboardButton("✏️ Edit / Re-type", callback_data=CANCEL_FEEDBACK)],
-        [InlineKeyboardButton("🗑️ Discard", callback_data=CANCEL)]
+        [InlineKeyboardButton("Yes, send it", callback_data=CONFIRM_SEND_FEEDBACK)],
+        [InlineKeyboardButton("Edit / Re-type", callback_data=CANCEL_FEEDBACK)],
+        [InlineKeyboardButton("Discard", callback_data=CANCEL)]
     ])

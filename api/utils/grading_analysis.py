@@ -159,110 +159,110 @@ def _generate_insight(pattern: Dict, stats: GradeStats) -> str:
     
     # Catastrophic failure
     if stats.failure_rate > 35:
-        return f"💀 Course massacre—over 1/3rd struggle (D+ or below), survival mode activated (AGP: {avg:.1f})"
+        return f"High Failure Rate: Over 35% of students received D+ or below. (AGP: {avg:.1f})"
     
     # Grade inflation crisis
     if pattern['a_pct'] > 50:
-        return f"🎪 Grade circus—A's handed out like candy, credibility zero (AGP: {avg:.1f})"
+        return f"High 'A' Concentration: Over 50% of students received an A or A*. (AGP: {avg:.1f})"
     
     # Bimodal nightmare
     if pattern['is_bimodal'] and pattern['a_pct'] > 25 and stats.failure_rate > 18:
-        return f"⚡ Sink or swim—you either dominate or drown, no rescue boats (AGP: {avg:.1f})"
+        return f"Bimodal Distribution: Clear split between high performers and failing grades. (AGP: {avg:.1f})"
     
     # === TIER 2: STRONG PATTERNS ===
     
     # Ultra generous
     if pattern['top_heavy'] > 70:
-        return f"Easy street—70%+ get B or better, barely a challenge😊 (AGP: {avg:.1f})"
+        return f"Top-Heavy Curve: Over 70% of students scored B or better. (AGP: {avg:.1f})"
     
     # Very tough grading
     if stats.failure_rate > 25 and avg < 6.5:
-        return f"⚔️ Brutal grader—25%+ struggle rate, prepare for battle (AGP: {avg:.1f})"
+        return f"Strict Grading: 25%+ failure rate with a low average grade point. (AGP: {avg:.1f})"
     
     # High-stakes polarization
     if pattern['is_polarized'] and stats.std_dev > 3.2:
-        return f"🎲 High-stakes lottery—massive variance, luck matters (AGP: {avg:.1f})"
+        return f"High Variance: Extreme spread of grades across the spectrum. (AGP: {avg:.1f})"
     
     # === TIER 3: CLEAR TENDENCIES ===
     
     # A-dominated but reasonable
     if pattern['is_dominated'] and pattern['top_zone'] == 'A' and pattern['a_pct'] > 30:
         if stats.failure_rate < 10:
-            return f"✨ A-friendly curve—30%+ excellence, low risk (AGP: {avg:.1f})"
+            return f"A-Dominated: 30%+ achieved A grades with low failure risk. (AGP: {avg:.1f})"
         else:
-            return f"🎯 Top-heavy split—many ace it, rest struggle (AGP: {avg:.1f})"
+            return f"A-Dominated (Mixed): High percentage of A grades, but notable failure rate. (AGP: {avg:.1f})"
     
     # B-dominated standard
     if pattern['is_dominated'] and pattern['top_zone'] == 'B':
         if avg > 8.2:
-            return f"🏆 B+ sweet spot—solid performance rewarded well (AGP: {avg:.1f})"
+            return f"B-Dominated (High): Strong concentration in the B range with high average. (AGP: {avg:.1f})"
         else:
-            return f"📊 B-zone parking lot—most land here, predictable (AGP: {avg:.1f})"
+            return f"B-Dominated (Standard): Normal distribution centered around B grades. (AGP: {avg:.1f})"
     
     # C-dominated mediocrity
     if pattern['is_dominated'] and pattern['top_zone'] == 'C':
         if stats.failure_rate > 20:
-            return f"📉 C-heavy struggle—low bar, high struggle rate (AGP: {avg:.1f})"
+            return f"C-Dominated (Low): Centered on C grades with a high failure rate. (AGP: {avg:.1f})"
         else:
-            return f"😐 Mediocrity central—C's dominate, uninspiring (AGP: {avg:.1f})"
+            return f"C-Dominated (Standard): Average performance heavily concentrated in the C range. (AGP: {avg:.1f})"
     
     # Failure-dominated disaster
     if pattern['top_zone'] in ['D', 'F']:
-        return f"🚨 Failure factory—most students don't make it (AGP: {avg:.1f})"
+        return f"Below Average: Majority of class scored D or F grades. (AGP: {avg:.1f})"
     
     # === TIER 4: DISTRIBUTION SHAPE ===
     
     # Left skewed (high grades)
     if pattern['is_left_skewed'] and avg > 8.0:
-        return f"📈 Grade inflation—curve heavily favors high performers (AGP: {avg:.1f})"
+        return f"Left-Skewed: Distribution favors high grades significantly. (AGP: {avg:.1f})"
     
     # Right skewed (low grades)
     if pattern['is_right_skewed'] and avg < 7.0:
-        return f"📊 Tough curve—skewed toward lower grades deliberately (AGP: {avg:.1f})"
+        return f"Right-Skewed: Distribution favors lower grades significantly. (AGP: {avg:.1f})"
     
     # Uniform but low
     if pattern['is_uniform'] and avg < 6.5:
-        return f"⚠️ Consistently tough—low grades spread evenly (AGP: {avg:.1f})"
+        return f"Uniform (Low): Even distribution with a low overall average. (AGP: {avg:.1f})"
     
     # Uniform but high
     if pattern['is_uniform'] and avg > 8.0:
-        return f"🌟 Consistently strong—high performance across board (AGP: {avg:.1f})"
+        return f"Uniform (High): Even distribution with a high overall average. (AGP: {avg:.1f})"
     
     # === TIER 5: SPECIFIC SCENARIOS ===
     
     # High middle clustering
     if pattern['middle_heavy'] > 60 and 7.0 <= avg <= 8.0:
-        return f"🎯 Classic bell curve—most land in B-C zone, textbook (AGP: {avg:.1f})"
+        return f"Standard Normal: Textbook bell curve centered in the B-C zone. (AGP: {avg:.1f})"
     
     # Balanced excellence
     if 8.0 <= avg <= 8.8 and stats.std_dev < 2.2 and stats.failure_rate < 12:
-        return f"💎 Balanced excellence—fair, achievable, well-designed (AGP: {avg:.1f})"
+        return f"Balanced Curve: Favorable distribution with low failure risk. (AGP: {avg:.1f})"
     
     # Mixed with high failure
     if not pattern['is_dominated'] and stats.failure_rate > 18:
-        return f"🎢 Chaotic spread—scattered grades, high dropout risk (AGP: {avg:.1f})"
+        return f"Mixed Distribution: Scattered grades with an above-average failure rate. (AGP: {avg:.1f})"
     
     # Boring average
     if 6.8 <= avg <= 7.5 and stats.std_dev < 2.0:
-        return f"😴 Paint-drying average—nothing exciting, pure mediocre (AGP: {avg:.1f})"
+        return f"Moderate Average: Clustered around the center with low variance. (AGP: {avg:.1f})"
     
     # === TIER 6: SAFETY NET (Context-aware fallbacks) ===
     
     # High average, varied distribution
     if avg > 8.5:
-        return f"🔥 High-flying cohort—motivated batch, strong results (AGP: {avg:.1f})"
+        return f"High Average: Strong overall performance across the cohort. (AGP: {avg:.1f})"
     
     # Low average, not dominated
     if avg < 6.5:
-        return f"⛰️ Uphill climb—low scores common, tough material (AGP: {avg:.1f})"
+        return f"Low Average: Generally lower scores across the distribution. (AGP: {avg:.1f})"
     
     # Scattered distribution
     if stats.std_dev > 2.5:
-        return f"🌪️ All over the map—no clear pattern, unpredictable (AGP: {avg:.1f})"
+        return f"Scattered Distribution: No clear central tendency, high variability. (AGP: {avg:.1f})"
     
     # True middle ground
     if 7.0 <= avg <= 7.8:
-        return f"⚖️ Dead center—neither easy nor hard, perfectly average (AGP: {avg:.1f})"
+        return f"Centered Distribution: Typical grading curve centered in the middle. (AGP: {avg:.1f})"
     
     # === ULTIMATE FALLBACK ===
-    return f"📋 Standard distribution—nothing remarkable (AGP: {avg:.1f})"
+    return f"Standard Distribution: Typical grading pattern with normal variance. (AGP: {avg:.1f})"
