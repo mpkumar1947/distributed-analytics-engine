@@ -45,6 +45,9 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
+# asyncpg expects 'ssl=require', not 'sslmode=require'
+DATABASE_URL = DATABASE_URL.replace("sslmode=require", "ssl=require")
+
 DEFAULT_CSV_PATH = os.path.join(BASE_DIR, "data", "courses_with_fileids.csv")
 
 # ------------------------------------------------------------------------------
