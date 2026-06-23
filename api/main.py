@@ -9,7 +9,8 @@ from .routers import (
     users,
     feedback,
     admin_users,
-    professors
+    professors,
+    admin_dashboard
 )
 
 # Application Metadata
@@ -32,6 +33,7 @@ app.include_router(professors.router)
 app.include_router(users.router)
 app.include_router(feedback.router)
 app.include_router(admin_users.router)
+app.include_router(admin_dashboard.router)
 # admin_broadcast router removed — broadcast is now handled directly in bot/api_client.py
 
 @app.get("/health", tags=["Health"])

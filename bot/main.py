@@ -106,6 +106,11 @@ if TELEGRAM_ADMIN_IDS_STR:
 ptb_application: Application = None
 webhook_fastapi_app = FastAPI(docs_url=None, redoc_url=None)
 
+def get_bot_instance():
+    """Helper to expose the active bot instance to external API routers."""
+    if ptb_application is None:
+        raise RuntimeError("PTB Application is not initialized yet.")
+    return ptb_application.bot
 
 # ==============================================================================
 # HEALTH ENDPOINT (for UptimeRobot + Cloudflare Worker pinging)
