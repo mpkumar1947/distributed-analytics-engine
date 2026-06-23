@@ -36,11 +36,16 @@ logger = logging.getLogger(__name__)
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-DEFAULT_CSV_PATH = os.path.join(BASE_DIR, "data", "courses_with_fileids.csv")
-
 if not DATABASE_URL:
     logger.error("DATABASE_URL not set in .env")
     sys.exit(1)
+
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+DEFAULT_CSV_PATH = os.path.join(BASE_DIR, "data", "courses_with_fileids.csv")
 
 # ------------------------------------------------------------------------------
 # DB SETUP
