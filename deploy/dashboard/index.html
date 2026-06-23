@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,30 +8,140 @@
     <!-- Use Tailwind for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .tab-btn { padding: 0.75rem 1.5rem; border-bottom: 2px solid transparent; cursor: pointer; color: #94a3b8; transition: all 0.2s; }
-        .tab-btn:hover { color: #f8fafc; border-bottom-color: #3b82f6; }
-        .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 600; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 50; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #f8fafc;
+            border-bottom-color: #3b82f6;
+        }
+
+        .tab-btn.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
         /* Telegram Preview Styling */
-        .tg-preview { background-color: #1e293b; border-radius: 12px; padding: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3); max-width: 400px;}
-        .tg-bubble { background-color: #3b82f6; color: white; padding: 8px 12px; border-radius: 18px; border-bottom-right-radius: 4px; display: inline-block; max-width: 100%; word-wrap: break-word; white-space: pre-wrap;}
-        .tg-bubble code { font-family: monospace; background: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 4px; }
-        .tg-bubble pre { font-family: monospace; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; display: block; overflow-x: auto; margin: 4px 0; }
-        .tg-bubble a { color: #93c5fd; text-decoration: underline; }
-        
+        .tg-preview {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+        }
+
+        .tg-bubble {
+            background-color: #3b82f6;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 18px;
+            border-bottom-right-radius: 4px;
+            display: inline-block;
+            max-width: 100%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .tg-bubble code {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .tg-bubble pre {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+            display: block;
+            overflow-x: auto;
+            margin: 4px 0;
+        }
+
+        .tg-bubble a {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
         /* Poll Preview */
-        .poll-preview-bubble { background-color: #1e293b; color: white; padding: 12px; border-radius: 12px; max-width: 400px; width: 100%; border: 1px solid #334155;}
-        .poll-option { background-color: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px;}
-        .poll-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #94a3b8; }
+        .poll-preview-bubble {
+            background-color: #1e293b;
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #334155;
+        }
+
+        .poll-option {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .poll-radio {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #94a3b8;
+        }
     </style>
 </head>
+
 <body class="h-screen flex flex-col overflow-hidden">
 
     <!-- PASSWORD GATE -->
@@ -38,24 +149,31 @@
         <div class="bg-slate-800 p-8 rounded-xl shadow-2xl max-w-sm w-full border border-slate-700">
             <h2 class="text-2xl font-bold text-white mb-2">Admin Login</h2>
             <p class="text-slate-400 text-sm mb-6">Enter dashboard password</p>
-            <input type="password" id="password-input" class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 mb-4" placeholder="Password...">
-            <button id="login-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-lg transition-colors">Unlock Dashboard</button>
+            <input type="password" id="password-input"
+                class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 mb-4"
+                placeholder="Password...">
+            <button id="login-btn"
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-lg transition-colors">Unlock
+                Dashboard</button>
             <p id="login-error" class="text-red-400 text-sm mt-3 text-center hidden">Incorrect password.</p>
         </div>
     </div>
 
     <!-- MAIN APP (Hidden until logged in) -->
     <div id="app-container" class="hidden flex-1 flex flex-col h-full overflow-hidden">
-        
+
         <!-- HEADER & STATS -->
         <header class="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 p-2 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
                 </div>
                 <h1 class="text-xl font-bold text-white tracking-tight">Gradiator Admin</h1>
             </div>
-            
+
             <div class="flex gap-6">
                 <div class="text-center px-4 border-r border-slate-700">
                     <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Users</p>
@@ -83,17 +201,22 @@
 
         <!-- CONTENT AREA -->
         <main class="flex-1 overflow-y-auto p-6 bg-slate-900">
-            
+
             <!-- FEEDBACK TAB -->
             <div id="tab-feedback" class="tab-content active max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold text-white">User Feedback</h2>
-                    <button onclick="loadFeedback()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <button onclick="loadFeedback()"
+                        class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                            </path>
+                        </svg>
                         Refresh
                     </button>
                 </div>
-                
+
                 <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -108,7 +231,9 @@
                         </thead>
                         <tbody id="feedback-tbody" class="divide-y divide-slate-700/50">
                             <!-- Populated via JS -->
-                            <tr><td colspan="6" class="p-8 text-center text-slate-400">Loading feedback...</td></tr>
+                            <tr>
+                                <td colspan="6" class="p-8 text-center text-slate-400">Loading feedback...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -118,11 +243,12 @@
             <div id="tab-users" class="tab-content max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold text-white">User Management</h2>
-                    <button onclick="loadUsers()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                    <button onclick="loadUsers()"
+                        class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
                         Refresh
                     </button>
                 </div>
-                
+
                 <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -148,32 +274,51 @@
                     <!-- Composer -->
                     <div class="flex flex-col h-[calc(100vh-200px)]">
                         <h2 class="text-2xl font-semibold text-white mb-6">Compose Broadcast</h2>
-                        <div class="bg-slate-800 border border-slate-700 rounded-xl flex-1 flex flex-col overflow-hidden shadow-lg">
+                        <div
+                            class="bg-slate-800 border border-slate-700 rounded-xl flex-1 flex flex-col overflow-hidden shadow-lg">
                             <!-- Toolbar -->
                             <div class="bg-slate-900 border-b border-slate-700 p-2 flex gap-1">
-                                <button onclick="insertFormat('**', '**')" class="p-2 hover:bg-slate-700 rounded text-slate-300 font-bold" title="Bold">B</button>
-                                <button onclick="insertFormat('__', '__')" class="p-2 hover:bg-slate-700 rounded text-slate-300 italic" title="Italic">I</button>
-                                <button onclick="insertFormat('`', '`')" class="p-2 hover:bg-slate-700 rounded text-slate-300 font-mono text-sm" title="Inline Code"><></button>
-                                <button onclick="insertFormat('```\n', '\n```')" class="p-2 hover:bg-slate-700 rounded text-slate-300 text-xs" title="Code Block">Code</button>
-                                <button onclick="insertLink()" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="Link">🔗</button>
+                                <button onclick="insertFormat('**', '**')"
+                                    class="p-2 hover:bg-slate-700 rounded text-slate-300 font-bold"
+                                    title="Bold">B</button>
+                                <button onclick="insertFormat('__', '__')"
+                                    class="p-2 hover:bg-slate-700 rounded text-slate-300 italic"
+                                    title="Italic">I</button>
+                                <button onclick="insertFormat('`', '`')"
+                                    class="p-2 hover:bg-slate-700 rounded text-slate-300 font-mono text-sm"
+                                    title="Inline Code">
+                                    <>
+                                </button>
+                                <button onclick="insertFormat('```\n', '\n```')"
+                                    class="p-2 hover:bg-slate-700 rounded text-slate-300 text-xs"
+                                    title="Code Block">Code</button>
+                                <button onclick="insertLink()" class="p-2 hover:bg-slate-700 rounded text-slate-300"
+                                    title="Link">🔗</button>
                             </div>
                             <!-- Editor -->
-                            <textarea id="broadcast-input" oninput="updatePreview()" class="w-full flex-1 bg-transparent text-white p-4 focus:outline-none resize-none font-sans" placeholder="Type your message here... Formatting uses standard Markdown, but we handle escaping automatically."></textarea>
+                            <textarea id="broadcast-input" oninput="updatePreview()"
+                                class="w-full flex-1 bg-transparent text-white p-4 focus:outline-none resize-none font-sans"
+                                placeholder="Type your message here... Formatting uses standard Markdown, but we handle escaping automatically."></textarea>
                             <!-- Footer -->
                             <div class="bg-slate-800 border-t border-slate-700 p-4 flex justify-between items-center">
                                 <p class="text-sm text-slate-400">MarkdownV2 Auto-Escaping Enabled.</p>
-                                <button onclick="confirmBroadcast()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                <button onclick="confirmBroadcast()"
+                                    class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                    </svg>
                                     Send to All
                                 </button>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Preview -->
                     <div class="flex flex-col h-[calc(100vh-200px)]">
                         <h2 class="text-lg font-medium text-slate-400 mb-6">Live Preview</h2>
-                        <div class="flex-1 bg-black/20 rounded-xl border border-slate-800 p-6 flex flex-col justify-end">
+                        <div
+                            class="flex-1 bg-black/20 rounded-xl border border-slate-800 p-6 flex flex-col justify-end">
                             <div class="tg-preview ml-auto">
                                 <div class="tg-bubble" id="broadcast-preview">
                                     Your message preview will appear here.
@@ -194,60 +339,85 @@
                         <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
                             <div class="mb-5">
                                 <label class="block text-sm font-medium text-slate-300 mb-2">Question</label>
-                                <input type="text" id="poll-question" oninput="updatePollPreview()" class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500" placeholder="Ask a question..." maxlength="300">
+                                <input type="text" id="poll-question" oninput="updatePollPreview()"
+                                    class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
+                                    placeholder="Ask a question..." maxlength="300">
                             </div>
-                            
+
                             <div class="mb-5">
                                 <label class="block text-sm font-medium text-slate-300 mb-2">Options (2 to 10)</label>
                                 <div id="poll-options-container" class="space-y-3">
-                                    <input type="text" oninput="updatePollPreview()" class="poll-opt-input w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" placeholder="Option 1" maxlength="100">
-                                    <input type="text" oninput="updatePollPreview()" class="poll-opt-input w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" placeholder="Option 2" maxlength="100">
+                                    <input type="text" oninput="updatePollPreview()"
+                                        class="poll-opt-input w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                        placeholder="Option 1" maxlength="100">
+                                    <input type="text" oninput="updatePollPreview()"
+                                        class="poll-opt-input w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                        placeholder="Option 2" maxlength="100">
                                 </div>
-                                <button onclick="addPollOption()" id="add-opt-btn" class="mt-3 text-sm text-blue-400 hover:text-blue-300 font-medium">+ Add Option</button>
+                                <button onclick="addPollOption()" id="add-opt-btn"
+                                    class="mt-3 text-sm text-blue-400 hover:text-blue-300 font-medium">+ Add
+                                    Option</button>
                             </div>
-                            
+
                             <div class="mb-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
                                 <div class="flex items-center justify-between mb-3">
                                     <span class="text-sm font-medium text-slate-300">Anonymous Voting</span>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="poll-anon" class="sr-only peer" checked>
-                                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                        <div
+                                            class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                        </div>
                                     </label>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm font-medium text-slate-300">Quiz Mode</span>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" id="poll-quiz" onchange="toggleQuizMode()" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                                        <input type="checkbox" id="poll-quiz" onchange="toggleQuizMode()"
+                                            class="sr-only peer">
+                                        <div
+                                            class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600">
+                                        </div>
                                     </label>
                                 </div>
-                                
+
                                 <div id="quiz-correct-selector" class="mt-4 hidden">
-                                    <label class="block text-xs font-medium text-slate-400 mb-2">Select Correct Option:</label>
-                                    <select id="poll-correct-id" class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm">
+                                    <label class="block text-xs font-medium text-slate-400 mb-2">Select Correct
+                                        Option:</label>
+                                    <select id="poll-correct-id"
+                                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm">
                                         <option value="0">Option 1</option>
                                         <option value="1">Option 2</option>
                                     </select>
                                 </div>
                             </div>
-                            
-                            <button onclick="confirmPoll()" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-medium shadow-lg">Send Poll to All Subscribers</button>
+
+                            <button onclick="confirmPoll()"
+                                class="w-full bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-medium shadow-lg">Send
+                                Poll to All Subscribers</button>
                         </div>
                     </div>
-                    
+
                     <!-- Preview -->
                     <div>
                         <h2 class="text-lg font-medium text-slate-400 mb-6">Poll Preview</h2>
-                        <div class="bg-black/20 rounded-xl border border-slate-800 p-6 flex flex-col items-center justify-center min-h-[400px]">
+                        <div
+                            class="bg-black/20 rounded-xl border border-slate-800 p-6 flex flex-col items-center justify-center min-h-[400px]">
                             <div class="poll-preview-bubble">
                                 <div class="flex items-center gap-2 mb-2 text-xs text-slate-400">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                                    </svg>
                                     <span id="prev-anon-text">Anonymous Poll</span>
                                 </div>
                                 <h3 id="prev-poll-question" class="font-bold text-lg mb-4">Ask a question...</h3>
                                 <div id="prev-poll-options" class="space-y-2">
-                                    <div class="poll-option"><div class="poll-radio"></div><span>Option 1</span></div>
-                                    <div class="poll-option"><div class="poll-radio"></div><span>Option 2</span></div>
+                                    <div class="poll-option">
+                                        <div class="poll-radio"></div><span>Option 1</span>
+                                    </div>
+                                    <div class="poll-option">
+                                        <div class="poll-radio"></div><span>Option 2</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -261,28 +431,39 @@
     <!-- MODAL: REPLY TO FEEDBACK -->
     <div id="modal-reply" class="modal">
         <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-lg p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-white mb-1">Reply to <span id="reply-username" class="text-blue-400"></span></h3>
-            <p class="text-xs text-slate-400 mb-4 font-mono truncate border-l-2 border-slate-600 pl-2 py-1" id="reply-context">Message context...</p>
-            
-            <textarea id="reply-input" class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg p-3 h-32 focus:outline-none focus:border-blue-500 mb-4 resize-none" placeholder="Type your reply here..."></textarea>
-            
+            <h3 class="text-xl font-bold text-white mb-1">Reply to <span id="reply-username"
+                    class="text-blue-400"></span></h3>
+            <p class="text-xs text-slate-400 mb-4 font-mono truncate border-l-2 border-slate-600 pl-2 py-1"
+                id="reply-context">Message context...</p>
+
+            <textarea id="reply-input"
+                class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg p-3 h-32 focus:outline-none focus:border-blue-500 mb-4 resize-none"
+                placeholder="Type your reply here..."></textarea>
+
             <div class="flex justify-end gap-3">
-                <button onclick="closeModal('modal-reply')" class="px-4 py-2 text-slate-300 hover:text-white">Cancel</button>
-                <button onclick="sendReply()" id="btn-send-reply" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium">Send Reply</button>
+                <button onclick="closeModal('modal-reply')"
+                    class="px-4 py-2 text-slate-300 hover:text-white">Cancel</button>
+                <button onclick="sendReply()" id="btn-send-reply"
+                    class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium">Send
+                    Reply</button>
             </div>
         </div>
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 border-l-4 border-blue-500 text-white px-6 py-4 rounded shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
-        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div id="toast"
+        class="fixed bottom-4 right-4 bg-slate-800 border-l-4 border-blue-500 text-white px-6 py-4 rounded shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
         <span id="toast-msg">Action successful.</span>
     </div>
 
     <script>
         // Config - MUST match the worker URL
-        const API_URL = "https://your-worker-url.workers.dev/admin/dashboard"; 
-        
+        const API_URL = "https://gradiator-dashboard-proxy.nodelessperson.workers.dev/admin/dashboard";
+
         let sessionHash = null;
         let currentReplyUserId = null;
         let currentFeedbackId = null;
@@ -296,24 +477,24 @@
         }
 
         // --- AUTH & INIT ---
-        
+
         document.getElementById('login-btn').addEventListener('click', async () => {
             const pwd = document.getElementById('password-input').value;
-            if(!pwd) return;
-            
+            if (!pwd) return;
+
             // Generate hash
             const hash = await sha256(pwd);
-            
+
             // We use the hash directly as the dashboard secret.
             // The Cloudflare worker validates if this hash matches the configured DASHBOARD_SECRET.
             // This prevents storing plaintext secrets in the frontend.
-            
+
             // Let's test it by hitting the stats endpoint
             try {
                 const res = await fetch(`${API_URL}/stats`, {
                     headers: { 'X-Dashboard-Secret': hash }
                 });
-                
+
                 if (res.ok) {
                     sessionHash = hash;
                     document.getElementById('login-screen').classList.add('hidden');
@@ -353,18 +534,18 @@
         }
 
         // --- TABS LOGIC ---
-        
+
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                if(btn.innerText === "Logout") return;
-                
+                if (btn.innerText === "Logout") return;
+
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
+
                 btn.classList.add('active');
                 const targetId = btn.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
-                
+
                 if (targetId === 'tab-users') loadUsers();
             });
         });
@@ -374,7 +555,7 @@
             document.getElementById('toast-msg').innerText = msg;
             toast.style.borderColor = isError ? '#ef4444' : '#3b82f6';
             toast.querySelector('svg').style.color = isError ? '#ef4444' : '#3b82f6';
-            
+
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
@@ -400,20 +581,20 @@
                 const res = await fetch(`${API_URL}/feedback`, { headers: getHeaders() });
                 const data = await res.json();
                 tbody.innerHTML = '';
-                
-                if(data.length === 0) {
+
+                if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No feedback entries found.</td></tr>';
                     return;
                 }
-                
+
                 data.forEach(fb => {
-                    const date = new Date(fb.submitted_at).toLocaleDateString(undefined, {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                    const date = new Date(fb.submitted_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                     const userDisplay = fb.username ? `@${fb.username}` : (fb.first_name || `ID:${fb.telegram_user_id}`);
-                    
+
                     let statusColor = "bg-red-500/20 text-red-400 border-red-500/30";
                     if (fb.status === 'read') statusColor = "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
                     if (fb.status === 'replied') statusColor = "bg-green-500/20 text-green-400 border-green-500/30";
-                    
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-700/30 transition-colors";
                     tr.innerHTML = `
@@ -430,10 +611,10 @@
                     `;
                     tbody.appendChild(tr);
                 });
-                
+
                 // Refresh stats
                 loadStats();
-            } catch (e) { 
+            } catch (e) {
                 tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-400">Failed to load feedback.</td></tr>';
             }
         }
@@ -457,25 +638,25 @@
                 const res = await fetch(`${API_URL}/users`, { headers: getHeaders() });
                 const data = await res.json();
                 tbody.innerHTML = '';
-                
+
                 data.forEach(user => {
                     const joined = new Date(user.subscribed_at).toLocaleDateString();
                     const active = user.last_active_at ? new Date(user.last_active_at).toLocaleDateString() : 'Never';
                     const name = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Unknown';
-                    
-                    const blockBtn = user.is_blocked 
+
+                    const blockBtn = user.is_blocked
                         ? `<button onclick="toggleBlock(${user.telegram_user_id}, false)" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs border border-slate-600">Unblock</button>`
                         : `<button onclick="toggleBlock(${user.telegram_user_id}, true)" class="bg-red-900/40 hover:bg-red-800/60 text-red-300 border border-red-800 px-3 py-1 rounded text-xs">Block</button>`;
-                        
-                    const subBadge = user.is_subscribed 
+
+                    const subBadge = user.is_subscribed
                         ? `<span class="w-3 h-3 bg-green-500 rounded-full inline-block" title="Subscribed"></span>`
                         : `<span class="w-3 h-3 bg-slate-600 rounded-full inline-block" title="Unsubscribed"></span>`;
-                    
+
                     const tr = document.createElement('tr');
                     tr.className = user.is_blocked ? "bg-red-900/10" : "hover:bg-slate-700/30 transition-colors";
                     tr.innerHTML = `
                         <td class="p-4 text-sm text-white font-medium">${name}</td>
-                        <td class="p-4 text-sm text-slate-400">${user.username ? '@'+user.username : '-'}</td>
+                        <td class="p-4 text-sm text-slate-400">${user.username ? '@' + user.username : '-'}</td>
                         <td class="p-4 text-sm text-slate-400">${joined}</td>
                         <td class="p-4 text-sm text-slate-400">${active}</td>
                         <td class="p-4">${subBadge}</td>
@@ -483,7 +664,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (e) { 
+            } catch (e) {
                 tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-400">Failed to load users.</td></tr>';
             }
         }
@@ -501,7 +682,7 @@
         }
 
         // --- REPLY MODAL LOGIC ---
-        
+
         function openReplyModal(fbId, userId, username, ctx) {
             currentFeedbackId = fbId;
             currentReplyUserId = userId;
@@ -518,25 +699,25 @@
 
         async function sendReply() {
             const text = document.getElementById('reply-input').value;
-            if(!text) return;
-            
+            if (!text) return;
+
             const btn = document.getElementById('btn-send-reply');
             btn.innerText = "Sending..."; btn.disabled = true;
-            
+
             try {
                 // Auto escape markdown v2 logic for standard text
                 const escapedText = text
                     .replace(/([_*\[\]()~`>#+\-=|{}.!])/g, "\\$1"); // Naive escaping for DM replies, broadcast has better parsing
-                    
+
                 await fetch(`${API_URL}/reply`, {
                     method: 'POST',
                     headers: getHeaders(),
                     body: JSON.stringify({ telegram_user_id: currentReplyUserId, message_text: escapedText })
                 });
-                
+
                 // Auto mark as replied
                 await updateFeedbackStatus(currentFeedbackId, 'replied');
-                
+
                 closeModal('modal-reply');
                 showToast("Reply sent successfully via Bot!");
             } catch (e) {
@@ -547,14 +728,14 @@
         }
 
         // --- BROADCAST LOGIC ---
-        
+
         function insertFormat(prefix, suffix) {
             const textarea = document.getElementById('broadcast-input');
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const text = textarea.value;
             const selectedText = text.substring(start, end);
-            
+
             textarea.value = text.substring(0, start) + prefix + selectedText + suffix + text.substring(end);
             textarea.focus();
             textarea.selectionEnd = end + prefix.length + suffix.length;
@@ -563,18 +744,18 @@
 
         function insertLink() {
             const url = prompt("Enter URL:", "https://");
-            if(url) insertFormat('[', `](${url})`);
+            if (url) insertFormat('[', `](${url})`);
         }
 
         function updatePreview() {
             const rawText = document.getElementById('broadcast-input').value;
             const preview = document.getElementById('broadcast-preview');
-            
+
             if (!rawText.trim()) {
                 preview.innerHTML = "Your message preview will appear here.";
                 return;
             }
-            
+
             // Very simple markdown parser for PREVIEW purposes only
             let html = rawText
                 .replace(/</g, "&lt;").replace(/>/g, "&gt;") // sanitize HTML
@@ -584,7 +765,7 @@
                 .replace(/__([^_]+)__/g, '<i>$1</i>')
                 .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
                 .replace(/\n/g, '<br>');
-                
+
             preview.innerHTML = html;
         }
 
@@ -595,7 +776,7 @@
             // This is a complex problem (escaping chars not inside code/bold blocks).
             // A simpler approach for the backend is just to pass standard markdown, but wait, the backend doesn't parse it.
             // Let's implement a rudimentary converter.
-            
+
             // Tokenize by code blocks first
             const parts = text.split(/(```[\s\S]*?```|`[^`]+`)/);
             for (let i = 0; i < parts.length; i++) {
@@ -613,19 +794,19 @@
                     // Let's just escape the truly annoying ones: ! - . > + = | { }
                 }
             }
-            
+
             // For now, let's just do a naive regex replacement on the annoying chars that aren't used in basic markdown
             return text.replace(/([!.\-=>+|{}~#])/g, "\\$1");
         }
 
         async function confirmBroadcast() {
             const rawText = document.getElementById('broadcast-input').value;
-            if(!rawText.trim()) return;
-            
-            if(!confirm("Are you sure you want to broadcast this message to ALL subscribers?")) return;
-            
+            if (!rawText.trim()) return;
+
+            if (!confirm("Are you sure you want to broadcast this message to ALL subscribers?")) return;
+
             const tgMarkdown = generateMarkdownV2(rawText);
-            
+
             try {
                 const res = await fetch(`${API_URL}/broadcast`, {
                     method: 'POST',
@@ -633,7 +814,7 @@
                     body: JSON.stringify({ message_text: tgMarkdown })
                 });
                 const data = await res.json();
-                
+
                 document.getElementById('broadcast-input').value = '';
                 updatePreview();
                 showToast(`Broadcast sent to ${data.sent_count} users!`);
@@ -641,12 +822,12 @@
         }
 
         // --- POLL LOGIC ---
-        
+
         let pollOptionCount = 2;
-        
+
         function addPollOption() {
-            if(pollOptionCount >= 10) return showToast("Maximum 10 options allowed.", true);
-            
+            if (pollOptionCount >= 10) return showToast("Maximum 10 options allowed.", true);
+
             pollOptionCount++;
             const container = document.getElementById('poll-options-container');
             const input = document.createElement('input');
@@ -655,20 +836,20 @@
             input.placeholder = `Option ${pollOptionCount}`;
             input.maxLength = 100;
             input.oninput = updatePollPreview;
-            
+
             container.appendChild(input);
             updateCorrectSelector();
             updatePollPreview();
-            
-            if(pollOptionCount === 10) document.getElementById('add-opt-btn').style.display = 'none';
+
+            if (pollOptionCount === 10) document.getElementById('add-opt-btn').style.display = 'none';
         }
-        
+
         function toggleQuizMode() {
             const isQuiz = document.getElementById('poll-quiz').checked;
             const selector = document.getElementById('quiz-correct-selector');
             const anonText = document.getElementById('prev-anon-text');
-            
-            if(isQuiz) {
+
+            if (isQuiz) {
                 selector.classList.remove('hidden');
                 document.getElementById('poll-anon').checked = true; // Quizzes are always anon in TG
                 document.getElementById('poll-anon').disabled = true;
@@ -679,50 +860,50 @@
                 anonText.innerText = document.getElementById('poll-anon').checked ? "Anonymous Poll" : "Public Poll";
             }
         }
-        
+
         document.getElementById('poll-anon').addEventListener('change', (e) => {
             const anonText = document.getElementById('prev-anon-text');
             const isQuiz = document.getElementById('poll-quiz').checked;
-            if(!isQuiz) anonText.innerText = e.target.checked ? "Anonymous Poll" : "Public Poll";
+            if (!isQuiz) anonText.innerText = e.target.checked ? "Anonymous Poll" : "Public Poll";
         });
-        
+
         function updateCorrectSelector() {
             const selector = document.getElementById('poll-correct-id');
             selector.innerHTML = '';
-            for(let i=0; i<pollOptionCount; i++) {
-                selector.innerHTML += `<option value="${i}">Option ${i+1}</option>`;
+            for (let i = 0; i < pollOptionCount; i++) {
+                selector.innerHTML += `<option value="${i}">Option ${i + 1}</option>`;
             }
         }
-        
+
         function updatePollPreview() {
             const q = document.getElementById('poll-question').value;
             document.getElementById('prev-poll-question').innerText = q || "Ask a question...";
-            
+
             const inputs = document.querySelectorAll('.poll-opt-input');
             const container = document.getElementById('prev-poll-options');
             container.innerHTML = '';
-            
+
             inputs.forEach((input, index) => {
-                const val = input.value || `Option ${index+1}`;
+                const val = input.value || `Option ${index + 1}`;
                 container.innerHTML += `<div class="poll-option"><div class="poll-radio"></div><span>${val}</span></div>`;
             });
         }
-        
+
         async function confirmPoll() {
             const q = document.getElementById('poll-question').value;
-            if(!q) return showToast("Question is required.", true);
-            
+            if (!q) return showToast("Question is required.", true);
+
             const inputs = document.querySelectorAll('.poll-opt-input');
             const options = Array.from(inputs).map(i => i.value).filter(v => v.trim() !== "");
-            
-            if(options.length < 2) return showToast("At least 2 options are required.", true);
-            
+
+            if (options.length < 2) return showToast("At least 2 options are required.", true);
+
             const isQuiz = document.getElementById('poll-quiz').checked;
             const isAnon = document.getElementById('poll-anon').checked;
             const correctId = isQuiz ? parseInt(document.getElementById('poll-correct-id').value) : null;
-            
-            if(!confirm(`Send ${isQuiz ? 'Quiz' : 'Poll'} to ALL subscribers?`)) return;
-            
+
+            if (!confirm(`Send ${isQuiz ? 'Quiz' : 'Poll'} to ALL subscribers?`)) return;
+
             try {
                 const res = await fetch(`${API_URL}/poll`, {
                     method: 'POST',
@@ -736,7 +917,7 @@
                     })
                 });
                 const data = await res.json();
-                
+
                 showToast(`Poll sent to ${data.sent_count} users!`);
                 document.getElementById('poll-question').value = '';
                 inputs.forEach(i => i.value = '');
@@ -746,4 +927,5 @@
 
     </script>
 </body>
+
 </html>

@@ -9,7 +9,7 @@ from sqlalchemy import select, func
 from api.database import get_db
 from api import models, schemas
 from api.crud import update_user_block_status
-from bot.main import get_bot_instance
+from fastapi import Request
 
 logger = logging.getLogger(__name__)
 
@@ -135,9 +135,9 @@ async def toggle_block_user(telegram_user_id: int, payload: schemas.UserBlockSta
 # ==============================================================================
 
 @router.post("/reply", dependencies=[Depends(verify_dashboard_secret)])
-async def send_direct_reply(payload: ReplyPayload):
+async def send_direct_reply(payload: ReplyPayload, request: Request):
     """Send a direct message from the bot to a specific user (e.g., replying to feedback)."""
-    bot = get_bot_instance()
+    bot = request.app.state.bot
     try:
         await bot.send_message(
             chat_id=payload.telegram_user_id,
@@ -150,9 +150,9 @@ async def send_direct_reply(payload: ReplyPayload):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/broadcast", dependencies=[Depends(verify_dashboard_secret)])
-async def send_broadcast(payload: BroadcastPayload, db: AsyncSession = Depends(get_db)):
+async def send_broadcast(payload: BroadcastPayload, request: Request, db: AsyncSession = Depends(get_db)):
     """Send a broadcast message to all subscribed users."""
-    bot = get_bot_instance()
+    bot = request.app.state.bot
     
     # Get all active subscribers
     stmt = select(models.User.telegram_user_id).where(models.User.is_subscribed == True)
@@ -185,9 +185,9 @@ async def send_broadcast(payload: BroadcastPayload, db: AsyncSession = Depends(g
     }
 
 @router.post("/poll", dependencies=[Depends(verify_dashboard_secret)])
-async def send_poll(payload: PollPayload, db: AsyncSession = Depends(get_db)):
+async def send_poll(payload: PollPayload, request: Request, db: AsyncSession = Depends(get_db)):
     """Send a native Telegram Poll or Quiz to all subscribed users."""
-    bot = get_bot_instance()
+    bot = request.app.state.bot
     
     stmt = select(models.User.telegram_user_id).where(models.User.is_subscribed == True)
     results = await db.execute(stmt)
