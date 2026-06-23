@@ -13,7 +13,7 @@ from fastapi import FastAPI, Request, Response
 import uvicorn
 
 # Local Imports
-from handlers import (
+from bot.handlers import (
     start_command, help_command, cancel_conversation,
     subscribe_command, unsubscribe_command,
     maintenance_command, broadcast_admin_command,
@@ -33,7 +33,7 @@ from handlers import (
     global_pre_processor
 )
 
-from constants import (
+from bot.constants import (
     SELECTING_ACTION, TYPING_COURSE, TYPING_PROF,
     SELECTING_COURSE_RESULTS, SELECTING_PROF_RESULTS,
     SELECTING_COURSE_FOR_PROF, SELECTING_YEAR_SEMESTER, SHOWING_FINAL_GRADES,

@@ -2,7 +2,7 @@ import logging
 from typing import List, Dict, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from constants import (
+from bot.constants import (
     COURSE_SEARCH_MODE, PROF_SEARCH_MODE, CANCEL, BACK_TO_MAIN,
     COURSE_SELECT_PREFIX, PROF_SELECT_PREFIX, VIEW_PROF_COURSES_PREFIX, YEAR_SEM_SELECT_PREFIX,
     BACK_TO_TYPING_COURSE, BACK_TO_TYPING_PROF,

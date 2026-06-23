@@ -9,13 +9,13 @@ import html
 import time 
 import re  # Added for escape_markdown_v2
 from typing import List, Dict, Optional
-from api_client import get_professor_dossier_api 
-from keyboards import get_dossier_keyboard 
-from constants import VIEW_PROF_COURSES_PREFIX 
+from bot.api_client import get_professor_dossier_api 
+from bot.keyboards import get_dossier_keyboard 
+from bot.constants import VIEW_PROF_COURSES_PREFIX 
 import redis
 
 # Import constants used in this file
-from constants import (
+from bot.constants import (
     # Main search flow
     BACK_TO_COURSE_LIST_FROM_PLOT_PREFIX, SELECTING_ACTION, TYPING_COURSE, TYPING_PROF,
     SELECTING_COURSE_RESULTS, SELECTING_PROF_RESULTS, SELECTING_COURSE_FOR_PROF,
@@ -38,7 +38,7 @@ from constants import (
     CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK
 )
 # API client
-from api_client import (
+from bot.api_client import (
     search_items_api,
     get_offerings_for_course_api,
     get_offerings_for_prof_api,
@@ -53,7 +53,7 @@ from api_client import (
     initiate_broadcast_api
 )
 # Keyboards
-from keyboards import (
+from bot.keyboards import (
     get_start_keyboard,
     create_search_results_keyboard,
     get_cancel_keyboard,
