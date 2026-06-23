@@ -1,13 +1,8 @@
 import io
 import math
 import os
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import numpy as np
 from typing import List, Dict, Any, Optional
 from collections import Counter
-from PIL import Image
 
 GRADE_POINTS = {'A*': 10, 'A': 10, 'B+': 9, 'B': 8, 'C+': 7, 'C': 6, 'D+': 5, 'D': 4, 'F': 0, 'E': 0}
 
@@ -89,6 +84,12 @@ def generate_career_plot(prof_name: str, career_stats: Dict[str, Any]) -> Option
     """
     Generate a clean, production-ready 'Career Grade Analysis' plot.
     """
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from PIL import Image
+
     if not career_stats: return None
 
     trend_data = career_stats.get('spi_trend_data', [])
