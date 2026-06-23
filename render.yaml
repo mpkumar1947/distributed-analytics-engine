@@ -19,5 +19,7 @@ services:
         value: /webhook
       - key: PYTHONPATH
         value: /opt/render/project/src
+      - key: PYTHON_VERSION
+        value: 3.11.6
     plan: free
     region: singapore  # Closest free-tier region to India
