@@ -1,0 +1,31 @@
+# Local development & one-time scripts (ingest_data.py, generate_prof_plots.py)
+# These are NOT deployed to Render — too heavy for 512MB RAM.
+#
+# Usage:
+#   pip install -r requirements-local.txt
+
+# Include the base server requirements
+-r requirements.txt
+
+# Data Processing (for ingest_data.py, validate_csv.py)
+pandas==2.2.3
+numpy==2.2.5
+tqdm
+
+# Plot Generation (for generate_prof_plots.py)
+matplotlib==3.10.1
+pillow==11.2.1
+contourpy==1.3.2
+cycler==0.12.1
+fonttools==4.57.0
+kiwisolver==1.4.8
+pyparsing==3.2.3
+
+# Sync DB driver (for scripts that use synchronous connections)
+psycopg2-binary==2.9.10
+
+# Date utilities
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2
+six==1.17.0

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: gradiator-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m bot.main
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard (Neon pooled connection string)
+      - key: REDIS_URL
+        sync: false  # Set manually in Render dashboard (Upstash Redis URL)
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false  # Set manually in Render dashboard
+      - key: TELEGRAM_ADMIN_IDS
+        sync: false  # Set manually in Render dashboard
+      - key: TELEGRAM_PLOT_STORAGE_CHANNEL_ID
+        sync: false  # Set manually in Render dashboard
+      - key: WEBHOOK_URL_PATH_PREFIX
+        value: /webhook
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+    plan: free
+    region: singapore  # Closest free-tier region to India

@@ -81,12 +81,8 @@ services:
     networks:
       - app_network
 
-  celery_worker:
     build:
       context: . # Build context is the project root
-      dockerfile: Dockerfile.celery
-    container_name: celery_worker_broadcasts
-    command: celery -A api.celery_app:app worker -l INFO -Q broadcasts -c 1
     environment:
       - DATABASE_URL=postgresql+asyncpg://testuser:testpassword@db:5432/gradedb
       - REDIS_URL=redis://redis:6379/0
@@ -97,8 +93,6 @@ services:
       redis:
         condition: service_started
     volumes:
-      - ./api:/app/api # Mounts API code (where celery_app and tasks are)
-      # If celery worker needs scripts or data directly, mount them here too.
       # For now, assuming tasks don't directly access ./scripts or ./data from worker.
     networks:
       - app_network

@@ -71,10 +71,9 @@ logger = logging.getLogger(__name__)
 BLOCKED_USER_CACHE = {} # {user_id: {"is_blocked": bool, "timestamp": float}}
 CACHE_DURATION_SECONDS = 300 # Cache block status for 5 minutes (5 * 60)
 
-# Connect to Redis using the service name. You'll need the REDIS_URL from .env
-REDIS_HOST = os.getenv("REDIS_URL", "redis://redis:6379/0").split("://")[1].split(":")[0] # Extracts 'redis'
-REDIS_PORT = int(os.getenv("REDIS_URL", "redis://redis:6379/0").split(":")[-1].split('/')[0]) # Extracts 6379
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
+# Connect to Redis — works with both local (redis://) and Upstash (rediss://) URLs
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
 MAINTENANCE_MESSAGE = (
     "🚧 **Under Maintenance** 🚧\n\n"

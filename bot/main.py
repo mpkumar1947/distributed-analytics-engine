@@ -63,13 +63,31 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-PUBLIC_DOMAIN = os.getenv("PUBLIC_DOMAIN")
+
+# Render sets PORT and RENDER_EXTERNAL_URL automatically.
+# Fall back to manual config for local development.
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")  # e.g., https://gradiator-bot.onrender.com
+
+if RENDER_EXTERNAL_URL:
+    # Running on Render — derive domain from the auto-set URL
+    PUBLIC_DOMAIN = RENDER_EXTERNAL_URL.replace("https://", "").replace("http://", "").rstrip("/")
+else:
+    # Local or custom VPS — use manual env vars
+    PUBLIC_DOMAIN = os.getenv("PUBLIC_DOMAIN")
+
 WEBHOOK_URL_PATH_PREFIX = os.getenv("WEBHOOK_URL_PATH_PREFIX", "/webhook")
-BOT_WEBHOOK_PORT = int(os.getenv("BOT_WEBHOOK_PORT", "7000"))
+
+# Render injects $PORT; fall back to BOT_WEBHOOK_PORT for local dev
+BOT_WEBHOOK_PORT = int(os.getenv("PORT", os.getenv("BOT_WEBHOOK_PORT", "7000")))
+
 TELEGRAM_ADMIN_IDS_STR = os.getenv("TELEGRAM_ADMIN_IDS", "")
 
-if not BOT_TOKEN or not PUBLIC_DOMAIN:
-    logger.fatal("Critical Env Vars Missing: TELEGRAM_BOT_TOKEN or PUBLIC_DOMAIN.")
+if not BOT_TOKEN:
+    logger.fatal("Critical Env Var Missing: TELEGRAM_BOT_TOKEN.")
+    exit(1)
+
+if not PUBLIC_DOMAIN:
+    logger.fatal("Critical Env Var Missing: PUBLIC_DOMAIN (and RENDER_EXTERNAL_URL not set).")
     exit(1)
 
 # Webhook URLs
@@ -89,6 +107,24 @@ ptb_application: Application = None
 webhook_fastapi_app = FastAPI(docs_url=None, redoc_url=None)
 
 
+# ==============================================================================
+# HEALTH ENDPOINT (for UptimeRobot + Cloudflare Worker pinging)
+# ==============================================================================
+@webhook_fastapi_app.get("/health")
+async def health_check():
+    """Health check endpoint to keep Render alive and verify bot status."""
+    return {"status": "alive", "service": "gradiator", "version": "2.0"}
+
+
+@webhook_fastapi_app.get("/")
+async def root():
+    """Root endpoint — Render health checks sometimes hit /."""
+    return {"status": "ok"}
+
+
+# ==============================================================================
+# WEBHOOK HANDLER
+# ==============================================================================
 @webhook_fastapi_app.post(WEBHOOK_PATH)
 async def telegram_webhook_endpoint(request: Request):
     """Handle incoming Telegram updates via Webhook."""
