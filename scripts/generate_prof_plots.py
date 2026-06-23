@@ -65,6 +65,7 @@ async def process_one_instructor(db, bot, instructor):
 async def main():
     parser = argparse.ArgumentParser(description="Generate and upload career plots for instructors.")
     parser.add_argument("--prof-id", type=int, help="Optional: Process only a single instructor by their ID.")
+    parser.add_argument("--resume", action="store_true", help="Skip instructors that already have a plot file ID.")
     args = parser.parse_args()
 
     bot = TelegramBot(token=BOT_TOKEN)
@@ -82,6 +83,10 @@ async def main():
         else:
             logger.info("Fetching all instructors from the database...")
             instructors_to_process = await crud.get_all_instructors(session)
+            
+        if args.resume:
+            logger.info("Filtering out instructors that already have a plot...")
+            instructors_to_process = [i for i in instructors_to_process if not i.career_plot_file_id]
         
         logger.info(f"Found {len(instructors_to_process)} instructor(s) to process.")
         
