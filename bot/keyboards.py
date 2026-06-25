@@ -13,7 +13,7 @@ from bot.constants import (
     PAGE_PROF_COURSE_LIST_PREFIX, PAGE_YEAR_SEMESTER_PREFIX,
     BACK_TO_COURSE_LIST_FROM_PLOT_PREFIX,
     FEEDBACK_TYPE_BUG, FEEDBACK_TYPE_SUGGESTION, FEEDBACK_TYPE_GENERAL,
-    CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK
+    CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK, RETYPE_FEEDBACK
 )
 
 logger = logging.getLogger(__name__)
@@ -225,6 +225,6 @@ def get_feedback_entry_cancel_keyboard() -> InlineKeyboardMarkup:
 def get_feedback_confirmation_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("Send", callback_data=CONFIRM_SEND_FEEDBACK)],
-        [InlineKeyboardButton("Edit", callback_data=CANCEL_FEEDBACK)],
+        [InlineKeyboardButton("Edit", callback_data=RETYPE_FEEDBACK)],
         [InlineKeyboardButton("Discard", callback_data=CANCEL)]
     ])

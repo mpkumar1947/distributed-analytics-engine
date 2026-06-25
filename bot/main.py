@@ -30,6 +30,7 @@ from bot.handlers import (
     view_prof_courses_callback,
     feedback_type_callback, feedback_message_handler,
     feedback_confirm_send_callback, feedback_cancel_or_edit_callback,
+    feedback_retype_callback,
     global_pre_processor, handle_force_reply_followup
 )
 
@@ -47,7 +48,7 @@ from bot.constants import (
     PAGE_PROF_COURSE_LIST_PREFIX, PAGE_YEAR_SEMESTER_PREFIX,
     ASK_FEEDBACK_TYPE, TYPING_FEEDBACK_MESSAGE, CONFIRM_FEEDBACK_SUBMISSION,
     FEEDBACK_TYPE_BUG, FEEDBACK_TYPE_SUGGESTION, FEEDBACK_TYPE_GENERAL,
-    VIEW_PROF_COURSES_PREFIX, CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK
+    VIEW_PROF_COURSES_PREFIX, CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK, RETYPE_FEEDBACK
 )
 
 # Load environment variables
@@ -212,6 +213,7 @@ async def setup_ptb_application():
             TYPING_FEEDBACK_MESSAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, feedback_message_handler)],
             CONFIRM_FEEDBACK_SUBMISSION: [
                 CallbackQueryHandler(feedback_confirm_send_callback, pattern=f"^{CONFIRM_SEND_FEEDBACK}$"),
+                CallbackQueryHandler(feedback_retype_callback, pattern=f"^{RETYPE_FEEDBACK}$"),
                 CallbackQueryHandler(feedback_cancel_or_edit_callback, pattern=f"^{CANCEL_FEEDBACK}$")
             ]
         },

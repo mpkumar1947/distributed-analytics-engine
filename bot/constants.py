@@ -53,4 +53,5 @@ FEEDBACK_TYPE_BUG = "fb_bug"
 FEEDBACK_TYPE_SUGGESTION = "fb_suggestion"
 FEEDBACK_TYPE_GENERAL = "fb_general"
 CONFIRM_SEND_FEEDBACK = "fb_confirm_send"
-CANCEL_FEEDBACK = "fb_cancel"
+CANCEL_FEEDBACK = "fb_cancel"        # From typing screen: reset type + message, go back to type selection
+RETYPE_FEEDBACK = "fb_retype"        # From confirmation screen: keep type, just re-type the message

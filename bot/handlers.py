@@ -35,7 +35,7 @@ from bot.constants import (
     # Feedback flow
     ASK_FEEDBACK_TYPE, TYPING_FEEDBACK_MESSAGE, CONFIRM_FEEDBACK_SUBMISSION,
     FEEDBACK_TYPE_BUG, FEEDBACK_TYPE_SUGGESTION, FEEDBACK_TYPE_GENERAL,
-    CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK
+    CONFIRM_SEND_FEEDBACK, CANCEL_FEEDBACK, RETYPE_FEEDBACK
 )
 # API client
 from bot.api_client import (
@@ -1823,14 +1823,41 @@ async def feedback_cancel_or_edit_callback(update: Update, context: ContextTypes
     await query.answer()
     user_id = update.effective_user.id if update.effective_user else "Unknown"
 
-    logger.info(f"User {user_id} triggered CANCEL_FEEDBACK (data: {query.data}). Resetting to ask feedback type.")
-    await query.edit_message_text(  # Standard Markdown
-        "Okay, let's restart the feedback process.\nWhat kind of feedback would you like to provide?",
+    logger.info(f"User {user_id} triggered CANCEL_FEEDBACK. Resetting to ask feedback type.")
+    await query.edit_message_text(
+        "◉ What's on your mind?",
         reply_markup=get_feedback_type_keyboard()
     )
     context.user_data.pop('feedback_message', None)
     context.user_data.pop('feedback_type', None)
     return ASK_FEEDBACK_TYPE
+
+
+async def feedback_retype_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Handles the 'Edit' button on the confirmation screen — goes back to typing
+    WITHOUT resetting the feedback type the user already chose."""
+    query = update.callback_query
+    if not query or not query.message:
+        return ConversationHandler.END
+
+    await query.answer()
+    feedback_type = context.user_data.get('feedback_type', 'fb_general')
+    type_str_map = {
+        FEEDBACK_TYPE_BUG: "Bug Report",
+        FEEDBACK_TYPE_SUGGESTION: "Suggestion",
+        FEEDBACK_TYPE_GENERAL: "General Feedback"
+    }
+    type_display = type_str_map.get(feedback_type, "Feedback")
+
+    logger.info(f"User {update.effective_user.id if update.effective_user else 'Unknown'} chose to re-type their {feedback_type} feedback.")
+    await query.edit_message_text(
+        f"▸ **{type_display}** — re-type your message below.",
+        reply_markup=get_feedback_entry_cancel_keyboard(),
+        parse_mode=ParseMode.MARKDOWN
+    )
+    # Clear only the message, keep the type
+    context.user_data.pop('feedback_message', None)
+    return TYPING_FEEDBACK_MESSAGE
 
 
 # logger = logging.getLogger(__name__)
