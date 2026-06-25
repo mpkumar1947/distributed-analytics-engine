@@ -76,9 +76,10 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
 MAINTENANCE_MESSAGE = (
-    " **Under Maintenance** \n\n"
-    "GRADIATOR is currently undergoing a scheduled upgrade. "
-    "The bot will be back online shortly. Thanks for your patience!"
+    "━━━━━━━━━━━━\n"
+    "*GRADIATOR* is under maintenance.\n"
+    "We'll be back shortly.\n"
+    "━━━━━━━━━━━━"
 )
 
 # --- NEW HELPER: Escape basic Markdown V1 ---
@@ -202,10 +203,10 @@ async def maintenance_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 # --- NEW HELPER: For formatting the dossier caption ---
 def _format_dossier_caption(dossier_data: Dict) -> str:
     """
-    Formats professor dossier data into a clean, human-readable caption (HTML-safe).
+    Formats professor dossier data into a clean terminal-style caption (HTML-safe).
     """
     name = html.escape(dossier_data.get("instructor_name", "N/A"))
-    parts = [f"<b>Professor:</b> {name}"]
+    parts = [f"━━━━━━━━━━━━\n<b>{name}</b>\nCareer Analysis\n━━━━━━━━━━━━"]
 
     if message := dossier_data.get("message"):
         parts.append(f"<i>{html.escape(message)}</i>")
@@ -221,22 +222,19 @@ def _format_dossier_caption(dossier_data: Dict) -> str:
     students = stats.get("total_students_graded_career", 0)
     if offerings and students:
         parts.append(
-            f"\n<b>Career Summary</b>\n"
-            f"• {offerings} offerings analyzed\n"
-            f"• {students} students graded"
+            f"\n▸ Offerings analyzed: {offerings}\n"
+            f"▸ Students graded: {students}"
         )
 
     # --- Grading Overview ---
     agp = stats.get("career_spi")
     sigma = stats.get("consistency_sigma")
-    style = html.escape(stats.get("career_centric_grading", "N/A"))
     if agp is not None:
-        overview = [f"\n<b>Grading Overview</b>"]
-        overview.append(f"• Avg. AGP: {agp:.2f}")
-        # overview.append(f"• Style: {style}")
+        overview = ["\n<b>Grading Profile</b>"]
+        overview.append(f"▸ Avg. AGP: {agp:.2f}")
         if sigma is not None:
-            overview.append(f"• Consistency (σ): {sigma:.3f}")
-            overview.append("  <i>A higher σ suggests grading varies more between offerings.</i>")
+            overview.append(f"▸ Consistency (σ): {sigma:.3f}")
+            overview.append("  <i>Higher σ = more variable grading across offerings</i>")
         parts.append("\n".join(overview))
 
     # --- Highlights ---
@@ -249,17 +247,17 @@ def _format_dossier_caption(dossier_data: Dict) -> str:
             taught_str = ", ".join(
                 [f"{html.escape(c['code'])} ({c['count']}×)" for c in most_taught]
             )
-            highlights.append(f"• Most Taught: {taught_str}")
+            highlights.append(f"▸ Most taught: {taught_str}")
         if generous:
             highlights.append(
-                f"• Most Generous: {html.escape(generous['course_code'])} "
+                f"▸ Most generous: {html.escape(generous['course_code'])} "
                 f"({generous['academic_year'].replace('-20','-')} "
                 f"{html.escape(generous['semester'][:3])}) — "
                 f"AGP {generous['spi']:.2f} ({generous['student_count']} students)"
             )
         if toughest:
             highlights.append(
-                f"• Toughest: {html.escape(toughest['course_code'])} "
+                f"▸ Toughest: {html.escape(toughest['course_code'])} "
                 f"({toughest['academic_year'].replace('-20','-')} "
                 f"{html.escape(toughest['semester'][:3])}) — "
                 f"AGP {toughest['spi']:.2f} ({toughest['student_count']} students)"
@@ -431,21 +429,19 @@ def handle_api_error(error_source: str, error: Exception, context: ContextTypes.
 
 
 def _get_search_list_text_template(item_type: str, count: int, query: str, current_page_num: int) -> str:
-    query_part = f" for '*{html.escape(query)}*'" if query else ""
-    count_text = f"Found {count} {item_type}" if count != 1 else f"Found 1 {item_type.rstrip('s')}"
-    return f" {count_text}{query_part}.\nPage {current_page_num}. Select one or browse:"
+    query_part = f" for `{html.escape(query)}`" if query else ""
+    count_text = f"{count} {item_type}" if count != 1 else f"1 {item_type.rstrip('s')}"
+    return f"◉ {count_text}{query_part}\n━━━━━━━━━━━━\nPage {current_page_num} — pick one:"
 
 
 def _get_prof_course_list_text_template(prof_name: str, count: int, current_page_num: int) -> str:
-    count_text = f" ({count} found)" if count != 1 else f" (1 found)"
-    return f"Courses taught by **{html.escape(prof_name)}**{count_text}.\nPage {current_page_num}. Which course?"
+    return f"◉ **{html.escape(prof_name)}** — {count} courses on record\n━━━━━━━━━━━━\nPage {current_page_num} — select a course:"
 
 
 def _get_year_semester_list_text_template(course_code: str, count: int, current_page_num: int,
                                           prof_name: Optional[str] = None) -> str:
-    prof_part = f" by Prof. **{html.escape(prof_name)}**" if prof_name else ""
-    count_text = f" ({count} offerings found)" if count != 1 else f" (1 offering found)"
-    return f"Offerings for **{html.escape(course_code)}**{prof_part}{count_text}.\nPage {current_page_num}. Select Year (Semester):"
+    prof_part = f" · Prof. **{html.escape(prof_name)}**" if prof_name else ""
+    return f"◉ **{html.escape(course_code)}**{prof_part} — {count} offerings\n━━━━━━━━━━━━\nPage {current_page_num} — select a term:"
 
 
 # --- HELPER: Display Final Grades & Plot ---
@@ -471,14 +467,14 @@ async def display_grades_and_plot(update: Update, context: ContextTypes.DEFAULT_
          # --- NEW: Get the centric grading label ---
         centric_grading_label = grade_data.get('centric_grading')
         # --- Build the Caption Text ---
-        title_line = f" <b>{html.escape(course_code)} - {html.escape(course_title)}</b> ({html.escape(year)} - {html.escape(sem)})"
-        prof_line = f"‍ <i>Instructor(s):</i> {html.escape(instructors)}"
-        students_line = f" <i>Students Graded:</i> {grade_data.get('total_graded_students', '?')}"
+        title_line = f"━━━━━━━━━━━━\n<b>{html.escape(course_code)} — {html.escape(course_title)}</b>\n{html.escape(year)} · {html.escape(sem)}\n━━━━━━━━━━━━"
+        prof_line = f"\n▸ Instructor(s): {html.escape(instructors)}"
+        students_line = f"▸ Students: {grade_data.get('total_graded_students', '?')}"
         caption_parts = [title_line, prof_line, students_line]
 
-        # --- NEW: Add the analysis line to the caption if it exists ---
+        # --- Add the analysis line to the caption if it exists ---
         if centric_grading_label:
-            analysis_line = f"\n <b>Analysis:</b> {html.escape(centric_grading_label)}"
+            analysis_line = f"▸ Analysis: {html.escape(centric_grading_label)}"
             caption_parts.append(analysis_line)
         
         grade_lines = []
@@ -489,13 +485,10 @@ async def display_grades_and_plot(update: Update, context: ContextTypes.DEFAULT_
             grade_lines.append(f"<code>{html.escape(str(gt)):<4}</code> : {gc}{perc_str}")
         
         if grade_lines:
-            caption_parts.extend(["\n<b>Grade Distribution:</b>", "\n".join(grade_lines)])
+            caption_parts.extend(["\n<b>Distribution</b>", "\n".join(grade_lines)])
         
-        # --- Add footer note (soft style) ---
-        footer_note = (
-            "\n\n<b>Note:</b> <i>Past trends only. Grading can vary! "
-             "Choose what interests you, and talk to seniors before requesting.</i>"
-        )    
+        # --- Footer ---
+        footer_note = "\n\n<i>Historical data only. Grading patterns may vary.</i>"
         
         final_caption = "\n".join(caption_parts) + footer_note
         
@@ -623,11 +616,11 @@ async def select_search_mode_callback(update: Update, context: ContextTypes.DEFA
 
         if callback_data == COURSE_SEARCH_MODE:
             context.user_data['search_mode'] = 'course'
-            prompt_text = " OK. Enter **course code OR full/partial title**:";
+            prompt_text = "▸ Enter course code or title:"
             next_state = TYPING_COURSE
         elif callback_data == PROF_SEARCH_MODE:
             context.user_data['search_mode'] = 'prof'
-            prompt_text = "‍ OK. Enter **professor's name**:";
+            prompt_text = "▸ Enter professor name:"
             next_state = TYPING_PROF
         else:
             raise ValueError(f"Unknown search mode callback: {callback_data}")
@@ -659,7 +652,7 @@ async def _handle_search_text_input(update: Update, context: ContextTypes.DEFAUL
 
     if len(query_text) < min_len:
         error_text = (
-            f"️ Min {min_len} characters required for {search_type} search.\nPlease re-enter {search_type} name/code:")
+            f"▸ Need at least {min_len} characters. Try again:")
         if bot_prompt_message_id:
             try:
                 await context.bot.edit_message_text(chat_id=chat_id, message_id=bot_prompt_message_id, text=error_text,
@@ -676,7 +669,7 @@ async def _handle_search_text_input(update: Update, context: ContextTypes.DEFAUL
             context.user_data['original_message_id_for_edit'] = sent_msg.message_id
         return current_typing_state
 
-    status_text = f"⏳ Searching {item_name_plural} for '*{html.escape(query_text)}*'..."
+    status_text = f"▸ Scanning for `{html.escape(query_text)}`..."
     if not bot_prompt_message_id:
         logger.warning(
             "_handle_search_text_input: bot_prompt_message_id is missing before status update. Sending new status message.")
@@ -1539,7 +1532,7 @@ async def cancel_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE
     await _disable_previous_plot_buttons(context)
     user = update.effective_user;
     logger.info(f"User {user.id if user else 'Unknown'} canceled a conversation.")
-    text = " Process cancelled.\nUse /start for a new search\n\n or /feedback to leave feedback."
+    text = "Session ended. Use /start to begin again."
     last_plot_msg_id = context.user_data.pop('last_plot_message_id', None)
     if last_plot_msg_id and update.effective_chat:
         try:
@@ -1565,26 +1558,25 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     if not update.message: return
 
     help_text = (
-        "ℹ️ *Welcome to GRADIATOR!*\n\n"
-        "Your guide to analyzing course and professor grade data.\n\n"
-        "--- *How to Use the Bot* ---\n"
-        "1️⃣ Use /start and choose to search by *Course* or *Professor*.\n\n"
-        "2️⃣ Select an item from the search results.\n\n"
-        "3️⃣ *Analyze the data!*\n"
-        "   - *If you selected a Course*, you'll see a list of every time it was offered. Pick one to view its detailed grade plot and analysis.\n"
-        "   - *If you selected a Professor*, you'll see their complete *Career Analysis*, including a plot showing their grading trends and key statistics.\n\n"
-        "--- *Understanding the Terms* ---\n"
-        "Here are the key metrics we use:\n\n"
-        "- *AGP (Average Grade Point):* The average grade point of all students in a specific course offering, similar to an SPI.\n"
-        "- *Centric Grading:* Summary of the overall grade distribution for a specific course (e.g., \"B+ Centric\").\n"
-        "- *Consistency (σ):* Measures how predictable a professor's grading is (it's the standard deviation). A **low** number is very consistent; a **high** number means their grading is erratic.\n\n"
-        "--- *Available Commands* ---\n"
-        "/start - Begin a new search.\n"
-        "/feedback - Report a bug or suggest a feature.\n"
-        "/subscribe - Get occasional updates about the bot.\n"
-        "/help - Show this message again."
+        "<b>GRADIATOR</b>\n"
+        "Grade analytics for IIT Kanpur\n"
+        "━━━━━━━━━━━━\n\n"
+        "<b>How it works</b>\n"
+        "1. /start → search by <b>Course</b> or <b>Professor</b>\n"
+        "2. Select from results\n"
+        "3. Pick a semester → get the grade plot + analysis\n\n"
+        "<b>Key metrics</b>\n"
+        "▸ <b>AGP</b> — Average grade point for that offering\n"
+        "▸ <b>Centric Grading</b> — Where grades cluster (e.g. B+ Centric)\n"
+        "▸ <b>Consistency (σ)</b> — Lower = predictable, higher = erratic\n\n"
+        "<b>Commands</b>\n"
+        "▸ /start — new search\n"
+        "▸ /feedback — report bugs or suggest features\n"
+        "▸ /subscribe — get updates\n"
+        "▸ /help — this message\n\n"
+        "<i>built different. — gradiator</i>"
     )
-    await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+    await update.message.reply_text(help_text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
 
 async def simple_close_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -1593,7 +1585,7 @@ async def simple_close_callback(update: Update, context: ContextTypes.DEFAULT_TY
         f"simple_close_callback (global) triggered user:{update.effective_user.id if update.effective_user else 'Unknown'}")
     await query.answer("Session closed.")
 
-    new_text_for_closed_message = "<i>This interaction has been closed. Use /start for a new search.</i>"  # HTML
+    new_text_for_closed_message = "<i>Session closed. /start for a new search.</i>"  # HTML
 
     try:
         if query.message and query.message.reply_markup:
@@ -1626,20 +1618,18 @@ async def subscribe_command(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             username=user.username
         )
         if api_response and api_response.get('is_subscribed'):
-            await update.message.reply_text(" You are now subscribed for updates!")
+            await update.message.reply_text("Subscribed. You'll hear from us when something ships.")
         elif api_response:
             logger.warning(
                 f"Subscription for user {user.id} processed by API but 'is_subscribed' not true or missing. Response: {api_response}")
-            await update.message.reply_text(" Your subscription status has been updated.")
+            await update.message.reply_text("Subscription status updated.")
         else:
             logger.error(f"Subscription API call failed or returned None for user {user.id}.")
             await update.message.reply_text(
-                "️ Could not process your subscription at this time. Please try again later.")
+                "Could not process your subscription at this time. Please try again later.")
     except Exception as e:
         logger.error(f"Error in /subscribe command for user {user.id}: {e}", exc_info=True)
-        # Error message via handle_api_error (which uses V2) or direct like this.
-        # For consistency, if direct error messages are simple, this is okay.
-        await update.message.reply_text(" An error occurred while trying to subscribe. Please try again later.")
+        await update.message.reply_text("Something went wrong. Please try again.")
 
 
 async def unsubscribe_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1653,22 +1643,21 @@ async def unsubscribe_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     try:
         api_response = await unsubscribe_user_api(tg_user_id=user.id)
         if api_response and api_response.get('is_subscribed') is False:
-            await update.message.reply_text(" You have been unsubscribed from updates.")
+            await update.message.reply_text("Unsubscribed. You can re-subscribe anytime with /subscribe.")
         elif api_response and "unsubscribed" in api_response.get("detail", "").lower():  # Check detail from API
-            await update.message.reply_text(" You have been unsubscribed from updates.")
+            await update.message.reply_text("Unsubscribed. You can re-subscribe anytime with /subscribe.")
         elif api_response:  # API responded but maybe status was already unsubscribed or other detail
             logger.warning(
                 f"Unsubscription for user {user.id} processed by API but confirmation unclear. Response: {api_response}")
             await update.message.reply_text(
-                api_response.get('detail',
-                                 "️ Could not confirm unsubscription. You might already be unsubscribed or an issue occurred."))
+                api_response.get('detail', "Could not confirm unsubscription. You may already be unsubscribed."))
         else:  # No response from API
             logger.error(f"Unsubscription API call failed or returned None for user {user.id}.")
             await update.message.reply_text(
-                "️ Could not process your unsubscription at this time. Please try again later.")
+                "Could not process your unsubscription at this time. Please try again later.")
     except Exception as e:
         logger.error(f"Error in /unsubscribe command for user {user.id}: {e}", exc_info=True)
-        await update.message.reply_text(" An error occurred while trying to unsubscribe. Please try again later.")
+        await update.message.reply_text("Something went wrong. Please try again.")
 
 
 async def feedback_start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -1681,8 +1670,8 @@ async def feedback_start_command(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data.pop('feedback_message', None)
     context.user_data.pop('feedback_type', None)
 
-    text = "Thank you for offering to provide feedback! \nWhat kind of feedback would you like to give?"
-    await update.message.reply_text(text, reply_markup=get_feedback_type_keyboard())  # Standard Markdown
+    text = "◉ What's on your mind?"
+    await update.message.reply_text(text, reply_markup=get_feedback_type_keyboard())
     return ASK_FEEDBACK_TYPE
 
 
@@ -1697,14 +1686,14 @@ async def feedback_type_callback(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data['feedback_type'] = feedback_type
 
     type_str_map = {
-        FEEDBACK_TYPE_BUG: "bug report ",
-        FEEDBACK_TYPE_SUGGESTION: "suggestion ",
-        FEEDBACK_TYPE_GENERAL: "general feedback ️"
+        FEEDBACK_TYPE_BUG: "Bug Report",
+        FEEDBACK_TYPE_SUGGESTION: "Suggestion",
+        FEEDBACK_TYPE_GENERAL: "General Feedback"
     }
-    type_display = type_str_map.get(feedback_type, "feedback")
+    type_display = type_str_map.get(feedback_type, "Feedback")
 
     await query.edit_message_text(
-        f"Great! You've selected: **{type_display}**.\nPlease type out your message now.",  # Standard Markdown
+        f"▸ **{type_display}** selected. Type your message below.",
         reply_markup=get_feedback_entry_cancel_keyboard(),
         parse_mode=ParseMode.MARKDOWN
     )
@@ -1738,9 +1727,9 @@ async def feedback_message_handler(update: Update, context: ContextTypes.DEFAULT
     escaped_feedback_preview = html.escape(feedback_text[:1000])
 
     confirmation_text = (
-        f"Thanks! Here's your **{type_display}**:\n\n"
-        f"```\n{escaped_feedback_preview}\n```\n\n"  # Markdown for code block
-        f"Shall I send this?"
+        f"▸ Here's your **{type_display}**:\n\n"
+        f"```\n{escaped_feedback_preview}\n```\n\n"
+        f"Send it?"
     )
     await update.message.reply_text(
         confirmation_text,
@@ -1774,7 +1763,7 @@ async def feedback_confirm_send_callback(update: Update, context: ContextTypes.D
         context.user_data.clear()
         return ConversationHandler.END
 
-    await query.edit_message_text("⏳ Submitting your feedback...", reply_markup=None)  # Simple text
+    await query.edit_message_text("▸ Sending...", reply_markup=None)  # Simple text
     api_response = None
     try:
         api_response = await submit_feedback_api(
@@ -1784,7 +1773,7 @@ async def feedback_confirm_send_callback(update: Update, context: ContextTypes.D
             username=user.username
         )
         if api_response:
-            await query.edit_message_text(" Thank you! Your feedback has been submitted successfully.",  # Simple text
+            await query.edit_message_text("Done. Your feedback is with the team.",
                                           reply_markup=None)
             logger.info(
                 f"Feedback from user {user.id} (type: {feedback_type}) submitted successfully. API Response: {api_response}")
@@ -2116,7 +2105,7 @@ async def handle_force_reply_followup(update: Update, context: ContextTypes.DEFA
         )
         if result:
             await msg.reply_text(
-                "Your message has been received by our team. We'll get back to you soon.",
+                "Noted. The team will follow up.",
                 parse_mode=ParseMode.MARKDOWN
             )
             logger.info(f"Follow-up feedback saved for user {user.id}: {feedback_text[:80]}")
@@ -2124,4 +2113,4 @@ async def handle_force_reply_followup(update: Update, context: ContextTypes.DEFA
             await msg.reply_text("Could not process your message. Please try /feedback if needed.")
     except Exception as e:
         logger.error(f"Error saving follow-up feedback for user {user.id}: {e}", exc_info=True)
-        await msg.reply_text("An error occurred. Please try /feedback if needed.")
+        await msg.reply_text("Something went wrong. Please try /feedback if needed.")
