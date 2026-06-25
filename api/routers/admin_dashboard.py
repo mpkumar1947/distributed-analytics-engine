@@ -142,7 +142,8 @@ async def send_direct_reply(payload: ReplyPayload, request: Request):
         # Prepend a professional team header (MarkdownV2 formatted)
         # The payload.message_text already contains MarkdownV2-escaped content from the frontend
         team_header = "*Response from Gradiator Team*\n\n"
-        full_text = team_header + payload.message_text
+        footer_hint = "\n\n_💡 Tip: Swipe left on this message to reply directly_"
+        full_text = team_header + payload.message_text + footer_hint
 
         await bot.send_message(
             chat_id=payload.telegram_user_id,
