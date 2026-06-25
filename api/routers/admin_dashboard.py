@@ -137,7 +137,6 @@ async def toggle_block_user(telegram_user_id: int, payload: schemas.UserBlockSta
 @router.post("/reply", dependencies=[Depends(verify_dashboard_secret)])
 async def send_direct_reply(payload: ReplyPayload, request: Request):
     """Send a direct message from the bot to a specific user (e.g., replying to feedback)."""
-    from telegram import ForceReply
     bot = request.app.state.bot
     try:
         # Prepend a professional team header (MarkdownV2 formatted)
@@ -148,13 +147,7 @@ async def send_direct_reply(payload: ReplyPayload, request: Request):
         await bot.send_message(
             chat_id=payload.telegram_user_id,
             text=full_text,
-            parse_mode="MarkdownV2",
-            # ForceReply pre-focuses the user's message bar so they can reply directly
-            # without needing to run /feedback again
-            reply_markup=ForceReply(
-                selective=True,
-                input_field_placeholder="Type your follow-up here..."
-            )
+            parse_mode="MarkdownV2"
         )
         return {"success": True}
     except Exception as e:
