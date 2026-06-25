@@ -1739,6 +1739,38 @@ async def feedback_message_handler(update: Update, context: ContextTypes.DEFAULT
     return CONFIRM_FEEDBACK_SUBMISSION
 
 
+async def _notify_admins_of_feedback(context: ContextTypes.DEFAULT_TYPE, user, feedback_type: str, message_text: str):
+    """Helper to send feedback notifications to the admin channel or directly to admins."""
+    user_identifier = f"@{user.username}" if user.username else f"ID: {user.id}"
+    admin_message = (
+        f" *New Feedback Received*\n\n"
+        f"*User:* {escape_markdown_v2(user.full_name or '')} \\({escape_markdown_v2(user_identifier)}\\)\n"
+        f"*Type:* `{escape_markdown_v2(feedback_type)}`\n\n"
+        f"*Message:*\n{escape_markdown_v2(message_text)}"
+    )
+
+    channel_id = os.getenv("TELEGRAM_ADMIN_CHANNEL_ID")
+    if channel_id:
+        try:
+            await context.bot.send_message(chat_id=channel_id, text=admin_message, parse_mode=ParseMode.MARKDOWN_V2)
+            logger.info(f"Feedback from {user.id} sent to admin channel.")
+            return
+        except Exception as e:
+            logger.error(f"Failed to send to admin channel: {e}")
+
+    # Fallback: Send directly to all admin IDs
+    admin_ids_str = os.getenv("TELEGRAM_ADMIN_IDS", "")
+    if admin_ids_str:
+        for admin_id in [aid.strip() for aid in admin_ids_str.split(",") if aid.strip()]:
+            try:
+                await context.bot.send_message(chat_id=admin_id, text=admin_message, parse_mode=ParseMode.MARKDOWN_V2)
+                logger.info(f"Feedback from {user.id} sent directly to admin {admin_id}.")
+            except Exception as e:
+                logger.error(f"Failed to send feedback to admin {admin_id}: {e}")
+    else:
+        logger.warning("No TELEGRAM_ADMIN_CHANNEL_ID or TELEGRAM_ADMIN_IDS set. Admins not notified.")
+
+
 async def feedback_confirm_send_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     user = update.effective_user
@@ -1775,29 +1807,9 @@ async def feedback_confirm_send_callback(update: Update, context: ContextTypes.D
         if api_response:
             await query.edit_message_text("Done. Your feedback is with the team.",
                                           reply_markup=None)
-            logger.info(
-                f"Feedback from user {user.id} (type: {feedback_type}) submitted successfully. API Response: {api_response}")
-
-            ADMIN_CHANNEL_ID = os.getenv("TELEGRAM_ADMIN_CHANNEL_ID")
-            if ADMIN_CHANNEL_ID:
-                user_identifier = f"@{user.username}" if user.username else f"ID: {user.id}"
-                # Critical: This message uses MARKDOWN_V2 and escapes user content
-                admin_message = (
-                    f" *New Feedback Received*\n\n"
-                    f"*User:* {escape_markdown_v2(user.full_name or '')} \\({escape_markdown_v2(user_identifier)}\\)\n"
-                    f"*Type:* `{escape_markdown_v2(feedback_type)}`\n\n"
-                    f"*Message:*\n{escape_markdown_v2(message_text)}"
-                )
-                try:
-                    await context.bot.send_message(chat_id=ADMIN_CHANNEL_ID, text=admin_message,
-                                                   parse_mode=ParseMode.MARKDOWN_V2)
-                    logger.info(f"Feedback from {user.id} sent to admin channel {ADMIN_CHANNEL_ID}.")
-                except Exception as e_admin:
-                    logger.error(f"Failed to send feedback to admin channel {ADMIN_CHANNEL_ID}: {e_admin}",
-                                 exc_info=True)
-            else:
-                logger.warning(
-                    "TELEGRAM_ADMIN_CHANNEL_ID not set in .env. Cannot send admin notification for feedback.")
+            logger.info(f"Feedback from user {user.id} (type: {feedback_type}) submitted successfully.")
+            # Send notification!
+            await _notify_admins_of_feedback(context, user, feedback_type, message_text)
         else:  # API call returned None or non-truthy
             logger.error(f"Feedback submission API call failed or returned None for user {user.id}.")
             await query.edit_message_text(
@@ -2136,6 +2148,9 @@ async def handle_force_reply_followup(update: Update, context: ContextTypes.DEFA
                 parse_mode=ParseMode.MARKDOWN
             )
             logger.info(f"Follow-up feedback saved for user {user.id}: {feedback_text[:80]}")
+            
+            # Send notification!
+            await _notify_admins_of_feedback(context, user, "fb_followup", f"[Follow-up] {feedback_text}")
         else:
             await msg.reply_text("Could not process your message. Please try /feedback if needed.")
     except Exception as e:
