@@ -9,7 +9,7 @@
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*', // For Pages dev URLs. Can be locked down to your specific pages.dev URL in production
-  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Dashboard-Secret',
 };
 
