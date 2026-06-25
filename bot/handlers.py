@@ -2080,3 +2080,48 @@ async def admin_help_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     )
 
     await update.message.reply_text(admin_help_text, parse_mode=ParseMode.MARKDOWN)
+
+
+# ==============================================================================
+# FORCE REPLY FOLLOW-UP HANDLER
+# Catches messages that are replies to any bot message (sent via ForceReply in admin replies).
+# Saves them as new feedback automatically so admins see them in the dashboard.
+# ==============================================================================
+async def handle_force_reply_followup(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Catches user replies to bot messages (ForceReply) and saves them as follow-up feedback.
+    This allows natural conversation without requiring the user to run /feedback again.
+    """
+    msg = update.message
+    user = update.effective_user
+
+    if not msg or not user or not msg.reply_to_message:
+        return
+
+    # Only handle replies to bot messages (ForceReply responses)
+    if msg.reply_to_message.from_user.id != context.bot.id:
+        return
+
+    feedback_text = msg.text.strip() if msg.text else None
+    if not feedback_text:
+        return
+
+    # Save as a "follow-up" feedback entry
+    try:
+        result = await submit_feedback_api(
+            tg_user_id=user.id,
+            feedback_type="fb_followup",
+            message_text=f"[Follow-up] {feedback_text}",
+            username=user.username
+        )
+        if result:
+            await msg.reply_text(
+                "Your message has been received by our team. We'll get back to you soon.",
+                parse_mode=ParseMode.MARKDOWN
+            )
+            logger.info(f"Follow-up feedback saved for user {user.id}: {feedback_text[:80]}")
+        else:
+            await msg.reply_text("Could not process your message. Please try /feedback if needed.")
+    except Exception as e:
+        logger.error(f"Error saving follow-up feedback for user {user.id}: {e}", exc_info=True)
+        await msg.reply_text("An error occurred. Please try /feedback if needed.")
