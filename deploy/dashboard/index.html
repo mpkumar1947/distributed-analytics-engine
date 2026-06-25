@@ -714,22 +714,45 @@
             document.getElementById(id).classList.remove('active');
         }
 
+        // Escape special characters for Telegram MarkdownV2
+        function escMd(text) {
+            return text.replace(/([_*\[\]()~`>#+=|{}.!\-])/g, '\\$1');
+        }
+
         async function sendReply() {
-            const text = document.getElementById('reply-input').value;
+            const text = document.getElementById('reply-input').value.trim();
             if (!text) return;
 
             const btn = document.getElementById('btn-send-reply');
             btn.innerText = "Sending..."; btn.disabled = true;
 
             try {
-                // Auto escape markdown v2 logic for standard text
-                const escapedText = text
-                    .replace(/([_*\[\]()~`>#+\-=|{}.!])/g, "\\$1"); // Naive escaping for DM replies, broadcast has better parsing
+                // Build a WhatsApp-style quoted reply:
+                // > [truncated original feedback]
+                //
+                // [admin reply]
+                const fb = feedbackStore[currentFeedbackId];
+                let fullMessage = escMd(text);
+
+                if (fb && fb.message_text) {
+                    // Truncate to 200 chars so the quote doesn't swamp the reply
+                    const originalSnippet = fb.message_text.length > 200
+                        ? fb.message_text.substring(0, 200) + '…'
+                        : fb.message_text;
+
+                    // Each line of the blockquote must start with >
+                    const quotedBlock = originalSnippet
+                        .split('\n')
+                        .map(line => '>' + escMd(line || ' '))
+                        .join('\n');
+
+                    fullMessage = `${quotedBlock}\n\n${escMd(text)}`;
+                }
 
                 await fetch(`${API_URL}/reply`, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ telegram_user_id: currentReplyUserId, message_text: escapedText })
+                    body: JSON.stringify({ telegram_user_id: currentReplyUserId, message_text: fullMessage })
                 });
 
                 // Auto mark as replied
