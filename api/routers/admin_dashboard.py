@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, Header, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, delete
 
 from api.database import get_db
 from api import models, schemas
@@ -112,6 +112,15 @@ async def update_feedback_status(feedback_id: int, payload: FeedbackStatusUpdate
     db_feedback.status = payload.status
     await db.commit()
     return {"success": True, "new_status": db_feedback.status}
+
+@router.delete("/feedback/clear", dependencies=[Depends(verify_dashboard_secret)])
+async def clear_all_feedback(db: AsyncSession = Depends(get_db)):
+    """Delete ALL feedback entries. Use with caution — intended for clearing test data."""
+    result = await db.execute(delete(models.Feedback))
+    await db.commit()
+    deleted_count = result.rowcount
+    logger.info(f"Cleared {deleted_count} feedback entries from database.")
+    return {"success": True, "deleted_count": deleted_count}
 
 @router.get("/users", dependencies=[Depends(verify_dashboard_secret)])
 async def list_users(db: AsyncSession = Depends(get_db), limit: int = 50, offset: int = 0):
