@@ -574,6 +574,9 @@
             } catch (e) { console.error("Stats fail", e); }
         }
 
+        // Store feedback data by ID so onclick buttons can look up without inline strings
+        const feedbackStore = {};
+
         async function loadFeedback() {
             const tbody = document.getElementById('feedback-tbody');
             tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Loading feedback...</td></tr>';
@@ -588,12 +591,21 @@
                 }
 
                 data.forEach(fb => {
-                    const date = new Date(fb.submitted_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    // Store in map for safe retrieval by ID
+                    feedbackStore[fb.id] = fb;
+
+                    const date = new Date(fb.submitted_at).toLocaleString('en-IN', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
                     const userDisplay = fb.username ? `@${fb.username}` : (fb.first_name || `ID:${fb.telegram_user_id}`);
 
                     let statusColor = "bg-red-500/20 text-red-400 border-red-500/30";
                     if (fb.status === 'read') statusColor = "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
                     if (fb.status === 'replied') statusColor = "bg-green-500/20 text-green-400 border-green-500/30";
+
+                    // Escape message text for HTML display only
+                    const safeMsg = fb.message_text
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-700/30 transition-colors";
@@ -603,10 +615,10 @@
                         <td class="p-4 text-sm"><span class="bg-slate-700 px-2 py-1 rounded text-xs">${fb.feedback_type}</span></td>
                         <td class="p-4"><span class="border px-2 py-1 rounded-full text-xs font-medium ${statusColor}">${fb.status.toUpperCase()}</span></td>
                         <td class="p-4 text-sm text-slate-300 max-w-xs">
-                            <div class="line-clamp-3" title="${fb.message_text.replace(/"/g, '&quot;')}">${fb.message_text}</div>
+                            <div class="line-clamp-3" title="${safeMsg}">${safeMsg}</div>
                         </td>
                         <td class="p-4 text-right whitespace-nowrap">
-                            <button onclick="openReplyModal(${fb.id}, ${fb.telegram_user_id}, '${userDisplay}', '${fb.message_text.replace(/'/g, "\\'")}')" class="text-blue-400 hover:text-blue-300 p-1 mx-1" title="Reply via Bot">💬</button>
+                            <button onclick="openReplyModalById(${fb.id})" class="text-blue-400 hover:text-blue-300 p-1 mx-1" title="Reply via Bot">💬</button>
                             <button onclick="updateFeedbackStatus(${fb.id}, 'read')" class="text-slate-400 hover:text-yellow-400 p-1 mx-1" title="Mark Read">👀</button>
                             <button onclick="updateFeedbackStatus(${fb.id}, 'replied')" class="text-slate-400 hover:text-green-400 p-1 mx-1" title="Mark Replied">✅</button>
                         </td>
@@ -685,11 +697,14 @@
 
         // --- REPLY MODAL LOGIC ---
 
-        function openReplyModal(fbId, userId, username, ctx) {
+        function openReplyModalById(fbId) {
+            const fb = feedbackStore[fbId];
+            if (!fb) return;
+            const username = fb.username ? '@' + fb.username : (fb.first_name || 'Unknown');
             currentFeedbackId = fbId;
-            currentReplyUserId = userId;
+            currentReplyUserId = fb.telegram_user_id;
             document.getElementById('reply-username').innerText = username;
-            document.getElementById('reply-context').innerText = ctx;
+            document.getElementById('reply-context').innerText = fb.message_text;
             document.getElementById('reply-input').value = "";
             document.getElementById('modal-reply').classList.add('active');
             document.getElementById('reply-input').focus();
