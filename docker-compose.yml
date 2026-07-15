@@ -73,7 +73,7 @@ services:
       - PUBLIC_DOMAIN=${PUBLIC_DOMAIN}
       - WEBHOOK_URL_PATH_PREFIX=${WEBHOOK_URL_PATH_PREFIX}
       - BOT_WEBHOOK_PORT=7000
-      - BOT_STARTUP_MAINTENANCE_MODE=true
+      - BOT_STARTUP_MAINTENANCE_MODE=false
     depends_on:
       - api
     volumes:
