@@ -2134,12 +2134,22 @@ async def handle_force_reply_followup(update: Update, context: ContextTypes.DEFA
     if not feedback_text:
         return
 
+    # Capture the original bot message they replied to (trim to 200 chars to avoid bloat)
+    original_bot_msg = msg.reply_to_message.text or msg.reply_to_message.caption or ""
+    original_bot_msg_trimmed = original_bot_msg.strip()[:200]
+    if original_bot_msg_trimmed:
+        stored_text = f"[In reply to: \"{original_bot_msg_trimmed}\"]\n\n{feedback_text}"
+        notify_text = f"[In reply to: \"{original_bot_msg_trimmed}\"]\n\n{feedback_text}"
+    else:
+        stored_text = f"[Follow-up] {feedback_text}"
+        notify_text = f"[Follow-up] {feedback_text}"
+
     # Save as a "follow-up" feedback entry
     try:
         result = await submit_feedback_api(
             tg_user_id=user.id,
             feedback_type="fb_followup",
-            message_text=f"[Follow-up] {feedback_text}",
+            message_text=stored_text,
             username=user.username
         )
         if result:
@@ -2148,9 +2158,9 @@ async def handle_force_reply_followup(update: Update, context: ContextTypes.DEFA
                 parse_mode=ParseMode.MARKDOWN
             )
             logger.info(f"Follow-up feedback saved for user {user.id}: {feedback_text[:80]}")
-            
-            # Send notification!
-            await _notify_admins_of_feedback(context, user, "fb_followup", f"[Follow-up] {feedback_text}")
+
+            # Send notification with full context!
+            await _notify_admins_of_feedback(context, user, "fb_followup", notify_text)
         else:
             await msg.reply_text("Could not process your message. Please try /feedback if needed.")
     except Exception as e:
