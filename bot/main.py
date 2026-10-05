@@ -31,7 +31,7 @@ from bot.handlers import (
     feedback_type_callback, feedback_message_handler,
     feedback_confirm_send_callback, feedback_cancel_or_edit_callback,
     feedback_retype_callback,
-    global_pre_processor, handle_force_reply_followup
+    global_pre_processor
 )
 
 from bot.constants import (
@@ -239,12 +239,6 @@ async def setup_ptb_application():
     ptb_application.add_handler(CommandHandler("userstatus", user_status_command))
     ptb_application.add_handler(CommandHandler("admin_commands", admin_help_command))
 
-    # 5. ForceReply follow-up handler — catches user replies to admin bot messages.
-    # group=1 ensures ConversationHandlers (group=0 by default) take priority.
-    ptb_application.add_handler(
-        MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND, handle_force_reply_followup),
-        group=1
-    )
 
     # Initialize
     await ptb_application.initialize()

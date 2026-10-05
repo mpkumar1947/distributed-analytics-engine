@@ -149,9 +149,8 @@ async def send_direct_reply(payload: ReplyPayload, request: Request):
     bot = request.app.state.bot
     try:
         # Prepend a professional team header (MarkdownV2 formatted)
-        # The payload.message_text already contains MarkdownV2-escaped content from the frontend
         team_header = "*Response from Gradiator Team*\n\n"
-        footer_hint = "\n\n_💡 Tip: Swipe left on this message to reply directly_"
+        footer_hint = "\n\n_Use /feedback to send us a follow\\-up message\\._"
         full_text = team_header + payload.message_text + footer_hint
 
         await bot.send_message(

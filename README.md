@@ -1,80 +1,65 @@
-# 📊 Distributed Analytics Engine (Gradiator)
+# Distributed Analytics Engine (Gradiator)
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg?logo=fastapi&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791.svg?logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D.svg?logo=redis&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Production_Ready-2496ED.svg?logo=docker&logoColor=white)
+A high-throughput, async-first backend service powering the Gradiator academic intelligence platform. Built to ingest, process, and serve complex academic historical data and grading distributions for 3,000+ Monthly Active Users under heavy concurrent load.
 
-> **🚀 Production Status:** Currently powering the Gradiator ecosystem for **2,000+ active students** at IIT Kanpur. Integrated live via Telegram at [@gradiator_iitk_bot](https://www.t.me/gradiator_iitk_bot).
+━━━━━━━━━━━━
 
-## 💡 Overview
+### ◉ Architecture & Infrastructure
 
-The **Distributed Analytics Engine** is the high-performance backend microservice driving the Gradiator academic platform. Built to handle heavy concurrent traffic during peak university registration periods, it ingests, processes, and serves complex academic data, grading trends, and instructor metrics in real-time.
+Designed as a stateless, event-driven microservice optimized for fast webhook execution and zero-downtime deployments.
 
-It acts as the central data nervous system, seamlessly communicating with both a React-based web frontend and a native Telegram Mini-App authentication system.
+▸ **Core Framework:** FastAPI (Python 3.10+) running in ASGI asynchronous webhook mode.
+▸ **Database:** Neon Serverless PostgreSQL. Connected via `asyncpg` utilizing transaction-level connection pooling.
+▸ **In-Memory Store:** Upstash Redis (TLS enabled) for strict rate-limiting, session state, and global maintenance toggles.
+▸ **Admin Tooling:** Cloudflare Workers acting as a secure edge proxy for a React-based administrative dashboard.
+▸ **Deployment:** Fully containerized, CI/CD pipeline integrated directly with Render.
 
-## 🏗️ Architecture & Tech Stack
+### ◉ Key Technical Capabilities
 
-This service is designed as an independent, fully containerized API, optimized for sub-millisecond response times.
+▸ **Asynchronous Telemetry:** Custom `asyncio` broadcast queue handling mass messaging to thousands of active Telegram users without blocking the main event loop or requiring heavy message brokers like Celery.
+▸ **Algorithmic Grading Analysis:** Generates dynamic instructor dossiers and flags grading anomalies by calculating historical standard deviations, mean grade distributions, and outlier metrics in real-time.
+▸ **Resilient Event Handling:** Gracefully handles transient database connection failures, network timeouts, and Telegram API limits through exponential backoff and Upstash-backed circuit breakers.
+▸ **Zero-Config Maintenance:** Implements a strict, Redis-backed maintenance interceptor at the FastAPI middleware layer, allowing instant traffic halting without requiring database compute or redeployments.
 
-* **Core API:** FastAPI (Python) for asynchronous, high-throughput REST endpoints.
-* **Database:** Managed Cloud PostgreSQL (Flexible Server) for robust, relational data storage.
-* **Caching & Queues:** Redis (via Docker) to cache intensive analytical queries and handle rate-limiting.
-* **Migrations:** SQLAlchemy + Alembic for version-controlled database schema management.
-* **Infrastructure:** Docker & Docker Compose, running behind an Nginx reverse proxy with dynamic cross-network Docker DNS resolution.
+━━━━━━━━━━━━
 
-## ✨ Key Features
-
-* **Live Telegram Integration:** Powers a custom, cryptographically secure (HMAC-SHA256) WhatsApp-Web style QR login flow using Telegram Mini Apps.
-* **Complex Data Aggregation:** Calculates real-time grade distributions (A, B, C ratios) across thousands of historical academic records.
-* **Algorithmic Profiling:** Generates dynamic "Instructor Dossiers" and automatically flags course offerings (e.g., "Excellent", "Course Massacre") based on standard deviation and mean grade analysis.
-* **Microservice Isolation:** Operates on its own isolated Docker network (`distributed-analytics-engine_app_network`), safely proxying requests from external frontends.
-
-## 🔀 Branching Strategy
-
-We maintain a clean, two-branch workflow to ensure production stability:
-
-* `main`: **Production environment.** Stable, battle-tested code actively deployed on the live VPS and serving the student body.
-* `development` / `data-pipeline`: Active workspace for testing new data ingestion scripts, experimenting with caching strategies, and drafting new API endpoints.
-
-## 💻 Local Setup & Deployment
-
-### Prerequisites
-
-* Docker & Docker Compose installed.
-* Access to the external PostgreSQL Flexible Server URI.
-
-### Quick Start
+### ◉ Local Deployment
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/distributed-analytics-engine.git
+   git clone https://github.com/mpkumar1947/distributed-analytics-engine.git
    cd distributed-analytics-engine
    ```
 
-2. **Environment Variables:**
-   Create a `.env` file in the root directory:
+2. **Environment Configuration:**
+   Provide the following secrets via `.env`:
    ```env
-   DATABASE_URL=postgresql://user:password@your-cloud-db-host.com:5432/dbname
-   REDIS_URL=redis://redis_broker:6379/0
-   # Add Telegram Bot Tokens / Auth secrets here
+   DATABASE_URL="postgresql+asyncpg://user:password@endpoint.aws.neon.tech/dbname?sslmode=require"
+   REDIS_URL="rediss://default:TOKEN@endpoint.upstash.io:6379"
+   TELEGRAM_BOT_TOKEN="your_telegram_bot_token"
+   TELEGRAM_ADMIN_IDS="id1,id2"
+   WEBHOOK_URL_PATH_PREFIX="/webhook"
+   BOT_STARTUP_MAINTENANCE_MODE="false"
    ```
 
-3. **Deploy the Engine:**
-   Spin up the FastAPI server and Redis broker in detached mode:
+3. **Database Migrations:**
+   Ensure the local schema matches production state via Alembic:
    ```bash
-   docker compose up -d --build
+   alembic upgrade head
    ```
 
-4. **Run Database Migrations:**
-   Ensure your local schema matches production:
+4. **Bootstrapping the API:**
+   Launch the FastAPI application using Uvicorn (local polling mode available for development):
    ```bash
-   docker compose exec api alembic upgrade head
+   uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
    ```
 
-Once running, the interactive Swagger UI API documentation is immediately available at: `http://localhost:8000/docs`
+### ◉ Branching Strategy
 
----
+▸ `main` — Production. Powers the Telegram bot and admin dashboard, strictly monitored and auto-deployed to Render.
+▸ `core-api-refactor` — Headless API variant. Strips away the bot and UI components, serving as an isolated grading metrics microservice for external campus projects.
 
-*Built to bring data-driven scheduling to the student community. Code with ❤️ and lots of coffee.*
+<br>
+<p align="center">
+  <i>built different. — gradiator</i>
+</p>
